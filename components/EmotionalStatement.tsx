@@ -1,6 +1,6 @@
 export function EmotionalStatement() {
   return (
-    <section className="section-pad-sm border-t border-border-warm bg-ivory">
+    <section className="section-pad-sm bg-stone">
       <div className="content-width grid gap-6 md:grid-cols-2 md:items-center md:gap-14">
         <h2 className="font-serif text-[1.75rem] leading-tight text-charcoal md:text-[2.25rem]">
           A name. Two dates. And an entire life in between.

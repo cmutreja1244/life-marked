@@ -60,13 +60,21 @@ export function Partners() {
           </div>
         </div>
 
-        <p className="mt-10 border-t border-ivory/12 pt-6 text-center font-serif text-lg text-ivory/90">
-          You offer it → We handle it → You earn from it
-        </p>
-        <div className="mt-2 flex flex-col items-center justify-center gap-1 text-center text-sm text-ivory/50 md:flex-row md:gap-8">
-          <span>Offer LifeMarked</span>
-          <span>LifeMarked handles fulfilment</span>
-          <span>Earn from every sale</span>
+        <div className="mt-12 grid gap-0 border-t border-ivory/12 pt-10 md:grid-cols-3">
+          {[
+            { step: "01", title: "You offer it", detail: "Offer LifeMarked" },
+            { step: "02", title: "We handle it", detail: "LifeMarked handles fulfilment" },
+            { step: "03", title: "You earn from it", detail: "Earn from every sale" },
+          ].map((item, index) => (
+            <div
+              key={item.step}
+              className={`py-6 md:px-8 md:py-0 ${index > 0 ? "border-t border-ivory/12 md:border-t-0 md:border-l" : ""} ${index === 0 ? "md:pl-0" : ""} ${index === 2 ? "md:pr-0" : ""}`}
+            >
+              <p className="font-serif text-2xl text-bronze/80">{item.step}</p>
+              <p className="mt-3 font-serif text-xl text-ivory">{item.title}</p>
+              <p className="mt-2 text-sm text-ivory/55">{item.detail}</p>
+            </div>
+          ))}
         </div>
 
         <div className="mt-8 text-center">
