@@ -1,24 +1,17 @@
 "use client";
 
 import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
 import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics";
 
 const timeline = [
   { year: "1941", event: "Born in Edinburgh." },
-  { year: "1963", event: "Married James." },
-  { year: "1968", event: "Moved into their first family home." },
+  { year: "1963", event: "Married James after meeting him at a dance in Portobello." },
+  { year: "1968", event: "Their first home — and eventually three children." },
   { year: "1985", event: "Opened Campbell Florists." },
-  { year: "1999", event: "Welcomed her first grandchild." },
-  { year: "2012", event: "Travelled through Italy." },
-  { year: "2025", event: "Remembered by three generations." },
-];
-
-const gallery = [
-  { src: "/images/margaret/portrait.png", alt: "Portrait of Margaret Eleanor Campbell" },
-  { src: "/images/margaret/wedding.png", alt: "Margaret and James on their wedding day" },
-  { src: "/images/margaret/family-1.png", alt: "Margaret with her family" },
-  { src: "/images/margaret/travel.png", alt: "Margaret travelling in Italy" },
-  { src: "/images/margaret/candid.png", alt: "Margaret in her garden" },
+  { year: "1999", event: "Became \"Gran\"." },
+  { year: "2012", event: "Finally made it to Florence." },
+  { year: "2025", event: "A life remembered by three generations." },
 ];
 
 const memories = [
@@ -29,151 +22,204 @@ const memories = [
 
 const favourites = [
   "Sunday roast",
+  "Ella Fitzgerald",
   "Gardening",
   "Florence",
-  "Ella Fitzgerald",
   "Handwritten letters",
 ];
 
-type MemorialDemoProps = {
-  embedded?: boolean;
-};
+const waveformHeights = [12, 24, 18, 32, 28, 14, 36, 22, 30, 16, 26, 20, 34, 18, 28, 12, 24, 30, 16, 22];
 
-export function MemorialDemo({ embedded = false }: MemorialDemoProps) {
+function Waveform() {
+  return (
+    <div className="flex h-10 items-end gap-[3px]" aria-hidden>
+      {waveformHeights.map((h, i) => (
+        <div key={i} className="waveform-bar" style={{ height: `${h}px` }} />
+      ))}
+    </div>
+  );
+}
+
+export function MemorialDemo() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <article
-      className={`overflow-hidden editorial-border bg-[#faf8f4] ${embedded ? "" : "section-padding"}`}
-      aria-label="Margaret Eleanor Campbell memorial concept preview"
+      className="bg-memorial-cream"
+      aria-label="Margaret Eleanor Campbell — LifeMarked concept preview"
     >
-      {!embedded && (
-        <div className="content-width mx-auto mb-8 px-5 md:px-10">
-          <span className="section-label">Concept preview</span>
-        </div>
-      )}
-
-      <div className="relative aspect-[16/9] max-h-[520px] w-full md:aspect-[21/9]">
+      {/* Opening spread */}
+      <div className="relative min-h-[72vh] md:min-h-[88vh]">
         <Image
-          src="/images/margaret/portrait.png"
+          src="/images/margaret/portrait.webp"
           alt=""
           fill
-          className="object-cover object-[center_20%]"
+          className="object-cover object-[center_15%]"
           sizes="100vw"
-          priority={embedded}
+          priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-deep-charcoal/75 via-deep-charcoal/20 to-transparent" />
-        <div className="absolute bottom-0 left-0 p-6 md:p-10">
-          <p className="section-label text-ivory/70">Margaret Eleanor Campbell</p>
-          <h3 className="mt-2 font-serif text-3xl text-ivory md:text-4xl">
-            Margaret Eleanor Campbell
-          </h3>
-          <p className="mt-2 text-ivory/80">1941 — 2025</p>
-          <p className="mt-4 max-w-md font-serif text-xl text-ivory/95 md:text-2xl">
-            Margaret made every room feel warmer.
-          </p>
-        </div>
-      </div>
-
-      <div className="content-width mx-auto grid gap-12 px-5 py-12 md:grid-cols-[1fr_1.2fr] md:gap-16 md:px-10 md:py-16">
-        <div>
-          <h4 className="font-serif text-xl text-charcoal">Biography</h4>
-          <div className="prose-width mt-6 space-y-4 text-warm-grey">
-            <p>
-              Margaret was born in Edinburgh during the winter of 1941, the eldest
-              of three sisters. She carried that eldest-sister steadiness through
-              every chapter of her life — calm, attentive, quietly determined.
-            </p>
-            <p>
-              With James, she built a home filled with flowers, music and long
-              conversations at the kitchen table. Campbell Florists, which she
-              opened in 1985, became a gathering place as much as a business.
-            </p>
-            <p>
-              She travelled when she could, gardened whenever she was home, and
-              wrote letters the way other people breathe — regularly, without
-              thinking about it.
+        <div className="absolute inset-0 bg-gradient-to-t from-deep-charcoal/85 via-deep-charcoal/25 to-deep-charcoal/10" />
+        <div className="absolute inset-x-0 bottom-0 space-section-md">
+          <div className="content-width mx-auto">
+            <p className="section-label text-ivory/50">Concept preview</p>
+            <h1 className="mt-3 font-serif text-4xl text-ivory md:text-6xl lg:text-7xl">
+              Margaret Eleanor Campbell
+            </h1>
+            <p className="mt-3 text-lg text-ivory/75 md:text-xl">1941 — 2025</p>
+            <p className="mt-6 max-w-xl font-serif text-2xl leading-snug text-ivory md:text-3xl">
+              Margaret made every room feel warmer.
             </p>
           </div>
         </div>
+      </div>
 
-        <div>
-          <h4 className="font-serif text-xl text-charcoal">Timeline</h4>
-          <ol className="mt-6 space-y-5">
-            {timeline.map((item) => (
-              <li key={item.year} className="grid grid-cols-[4rem_1fr] gap-4 border-b border-border-warm pb-5 last:border-0">
-                <span className="font-serif text-lg text-bronze">{item.year}</span>
-                <span className="text-warm-grey">{item.event}</span>
+      {/* Biography — editorial spread */}
+      <div className="space-section-lg">
+        <div className="content-width mx-auto grid gap-16 lg:grid-cols-[1fr_1.15fr] lg:gap-20">
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-10%" }}
+            transition={{ duration: 0.7 }}
+            className="relative aspect-[4/5] lg:aspect-auto lg:min-h-[520px]"
+          >
+            <Image
+              src="/images/margaret/wedding.webp"
+              alt="Margaret and James, 1963"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 45vw"
+            />
+            <p className="absolute bottom-4 left-4 text-xs tracking-wide text-ivory/80">
+              Margaret &amp; James, Portobello · 1963
+            </p>
+          </motion.div>
+
+          <div className="flex flex-col justify-center">
+            <p className="reading-width space-y-5 text-[1.05rem] leading-[1.75] text-warm-grey">
+              <span className="block">
+                Margaret was born in Edinburgh during the winter of 1941 — eldest
+                of three sisters, calm and quietly determined from the start.
+              </span>
+              <span className="block">
+                With James she built a home filled with flowers, music and long
+                conversations. Campbell Florists, opened in 1985, became a gathering
+                place as much as a shop.
+              </span>
+              <span className="block">
+                She gardened whenever she was home, travelled when she could,
+                and wrote letters the way other people breathe.
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Full-bleed family moment */}
+      <div className="relative aspect-[16/10] md:aspect-[21/9]">
+        <Image
+          src="/images/margaret/family-1.webp"
+          alt="Margaret with her family in the garden"
+          fill
+          className="object-cover"
+          sizes="100vw"
+        />
+        <p className="absolute bottom-5 left-5 text-xs tracking-wide text-ivory/85 md:bottom-8 md:left-10">
+          Summer in the garden · Edinburgh
+        </p>
+      </div>
+
+      {/* Timeline */}
+      <div className="space-section-lg">
+        <div className="content-width mx-auto max-w-2xl">
+          <hr className="editorial-rule mb-12" />
+          <ol className="space-y-0">
+            {timeline.map((item, i) => (
+              <li
+                key={item.year}
+                className={`grid grid-cols-[5rem_1fr] gap-6 py-7 ${i > 0 ? "border-t border-border-warm" : ""}`}
+              >
+                <span className="font-serif text-xl text-bronze">{item.year}</span>
+                <span className="text-[1.05rem] leading-relaxed text-charcoal">{item.event}</span>
               </li>
             ))}
           </ol>
         </div>
       </div>
 
-      <div className="content-width mx-auto px-5 pb-12 md:px-10 md:pb-16">
-        <h4 className="font-serif text-xl text-charcoal">Gallery</h4>
-        <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
-          {gallery.map((img) => (
-            <div key={img.src} className="relative aspect-[3/4] overflow-hidden editorial-border">
-              <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="200px" />
-            </div>
-          ))}
+      {/* Audio moment */}
+      <div className="space-section-md bg-ivory">
+        <div className="content-width mx-auto grid gap-10 lg:grid-cols-[280px_1fr] lg:items-center">
+          <div className="relative aspect-square max-w-[280px]">
+            <Image
+              src="/images/margaret/candid.webp"
+              alt="Margaret in her garden, 1987"
+              fill
+              className="object-cover"
+              sizes="280px"
+            />
+          </div>
+          <div>
+            <p className="section-label">Voice · concept preview</p>
+            <p className="mt-3 font-serif text-2xl text-charcoal md:text-3xl">Margaret, 1987</p>
+            <p className="mt-2 font-serif text-xl italic text-warm-grey">
+              &ldquo;How I met James&rdquo;
+            </p>
+            <button
+              type="button"
+              className="mt-8 flex w-full max-w-lg items-center gap-5 border-t border-border-warm pt-8 text-left"
+              onClick={() => trackEvent(ANALYTICS_EVENTS.demoAudioClicked)}
+              aria-label="Play audio preview — concept only"
+            >
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-charcoal text-lg text-charcoal">
+                ▶
+              </span>
+              <div className="min-w-0 flex-1">
+                <Waveform />
+                <p className="mt-3 text-sm text-warm-grey">4:12 · Concept functionality</p>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="content-width mx-auto grid gap-10 px-5 pb-12 md:grid-cols-3 md:px-10 md:pb-16">
-        <div className="editorial-border bg-ivory p-6">
-          <p className="section-label">Voice</p>
-          <p className="mt-4 font-serif text-lg text-charcoal">
-            Hear Margaret tell the story of how she met James
-          </p>
-          <button
-            type="button"
-            className="mt-6 flex w-full items-center gap-4 border-t border-border-warm pt-6 text-left"
-            onClick={() => trackEvent(ANALYTICS_EVENTS.demoAudioClicked)}
-            aria-label="Play audio preview — concept only, no audio file"
-          >
-            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-charcoal text-charcoal">
-              ▶
-            </span>
-            <span className="text-sm text-warm-grey">Concept preview — audio not yet available</span>
-          </button>
-        </div>
-
-        <div className="relative aspect-video overflow-hidden editorial-border md:col-span-1">
+      {/* Travel spread */}
+      <div className="grid md:grid-cols-2">
+        <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[480px]">
           <Image
-            src="/images/margaret/candid.png"
-            alt="Archival video thumbnail — concept preview"
+            src="/images/margaret/travel.webp"
+            alt="Margaret in Florence, 2012"
             fill
             className="object-cover"
-            sizes="400px"
+            sizes="50vw"
           />
-          <div className="absolute inset-0 flex items-center justify-center bg-deep-charcoal/30">
-            <span className="rounded-full border border-ivory/80 px-4 py-2 text-sm text-ivory">
-              Archival video — concept
-            </span>
+        </div>
+        <div className="flex flex-col justify-center space-section-md bg-deep-charcoal text-ivory">
+          <div className="content-width mx-auto max-w-md px-0 md:px-10">
+            <p className="section-label text-ivory/45">Memories</p>
+            <ul className="mt-8 space-y-8">
+              {memories.map((memory) => (
+                <li key={memory} className="font-serif text-xl leading-snug md:text-2xl">
+                  &ldquo;{memory}&rdquo;
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
+      </div>
 
-        <div>
-          <p className="section-label">Memories</p>
-          <ul className="mt-4 space-y-4">
-            {memories.map((memory) => (
-              <li key={memory} className="font-serif text-lg leading-snug text-charcoal">
-                &ldquo;{memory}&rdquo;
+      {/* Favourite things */}
+      <div className="space-section-xl text-center">
+        <div className="content-width mx-auto">
+          <p className="section-label">The things that made Margaret, Margaret.</p>
+          <ul className="mx-auto mt-10 flex max-w-3xl flex-wrap justify-center gap-x-10 gap-y-4">
+            {favourites.map((item) => (
+              <li key={item} className="font-serif text-2xl text-charcoal md:text-3xl">
+                {item}
               </li>
             ))}
           </ul>
         </div>
-      </div>
-
-      <div className="content-width mx-auto border-t border-border-warm px-5 py-10 md:px-10">
-        <p className="section-label">Favourite things</p>
-        <ul className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
-          {favourites.map((item) => (
-            <li key={item} className="font-serif text-xl text-charcoal">
-              {item}
-            </li>
-          ))}
-        </ul>
       </div>
     </article>
   );

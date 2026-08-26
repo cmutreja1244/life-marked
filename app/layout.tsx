@@ -31,14 +31,14 @@ export const metadata: Metadata = {
     siteName: "LifeMarked",
     locale: "en_GB",
     type: "website",
-    images: [{ url: "/images/og-image.png", width: 1200, height: 630 }],
+    images: [{ url: "/images/og-image.webp", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "LifeMarked — Every Life Leaves More Than a Name",
     description:
       "LifeMarked connects physical memorials with the stories, photographs, voices and memories behind them.",
-    images: ["/images/og-image.png"],
+    images: ["/images/og-image.webp"],
   },
   robots: { index: true, follow: true },
 };

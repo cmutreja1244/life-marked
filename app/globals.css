@@ -7,6 +7,7 @@
   --bronze: #8c7456;
   --deep-charcoal: #1d1d1b;
   --border-warm: rgba(110, 106, 99, 0.22);
+  --memorial-cream: #faf8f4;
 }
 
 @theme inline {
@@ -16,6 +17,7 @@
   --color-bronze: var(--bronze);
   --color-deep-charcoal: var(--deep-charcoal);
   --color-border-warm: var(--border-warm);
+  --color-memorial-cream: var(--memorial-cream);
   --font-sans: var(--font-geist-sans);
   --font-serif: var(--font-instrument-serif);
 }
@@ -27,6 +29,14 @@ html {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
@@ -47,11 +57,36 @@ body {
 }
 
 .prose-width {
-  max-width: 42rem;
+  max-width: 38rem;
 }
 
 .content-width {
-  max-width: 80rem;
+  max-width: 76rem;
+}
+
+.reading-width {
+  max-width: 34rem;
+}
+
+/* Deliberate spacing rhythm — not uniform py everywhere */
+.space-section-xl {
+  padding-block: clamp(5rem, 14vw, 9rem);
+  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.space-section-lg {
+  padding-block: clamp(4rem, 10vw, 6.5rem);
+  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.space-section-md {
+  padding-block: clamp(3rem, 7vw, 5rem);
+  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.space-section-sm {
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
 }
 
 .section-padding {
@@ -59,8 +94,9 @@ body {
   padding-inline: clamp(1.25rem, 4vw, 2.5rem);
 }
 
-.editorial-border {
-  border: 1px solid var(--border-warm);
+.editorial-rule {
+  border: none;
+  border-top: 1px solid var(--border-warm);
 }
 
 .btn-primary {
@@ -68,14 +104,14 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 2.75rem;
-  padding: 0.625rem 1.5rem;
+  padding: 0.625rem 1.625rem;
   font-size: 0.9375rem;
   font-weight: 500;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
   color: var(--ivory);
   background: var(--charcoal);
   border: 1px solid var(--charcoal);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.25s ease;
 }
 
 .btn-primary:hover {
@@ -84,7 +120,24 @@ body {
 
 .btn-primary:focus-visible {
   outline: 2px solid var(--bronze);
-  outline-offset: 2px;
+  outline-offset: 3px;
+}
+
+.btn-ghost-light {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ivory);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+  text-decoration-color: rgba(244, 240, 232, 0.35);
+  transition: text-decoration-color 0.2s ease;
+}
+
+.btn-ghost-light:hover {
+  text-decoration-color: var(--ivory);
 }
 
 .text-link {
@@ -92,8 +145,8 @@ body {
   font-weight: 500;
   color: var(--charcoal);
   text-decoration: underline;
-  text-underline-offset: 0.25em;
-  text-decoration-color: rgba(36, 36, 34, 0.35);
+  text-underline-offset: 0.28em;
+  text-decoration-color: rgba(36, 36, 34, 0.3);
   transition: text-decoration-color 0.2s ease;
 }
 
@@ -103,13 +156,41 @@ body {
 
 .text-link:focus-visible {
   outline: 2px solid var(--bronze);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 .section-label {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--warm-grey);
+}
+
+.input-field {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--border-warm);
+  background: transparent;
+  padding: 0.75rem 0;
+  font-size: 1rem;
+  color: var(--charcoal);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.input-field:focus {
+  border-color: var(--charcoal);
+}
+
+.input-field::placeholder {
+  color: rgba(110, 106, 99, 0.6);
+}
+
+.waveform-bar {
+  flex: 1;
+  min-width: 2px;
+  background: var(--bronze);
+  border-radius: 1px;
+  opacity: 0.45;
 }

@@ -68,30 +68,22 @@ export function ContactForm() {
 
   if (state === "success") {
     return (
-      <div className="editorial-border bg-[#faf8f4] p-8 md:p-10">
-        <p className="font-serif text-2xl text-charcoal">
+      <div className="py-4">
+        <p className="font-serif text-3xl text-charcoal">
           Thank you. We&apos;ll be in touch shortly.
         </p>
-        <button
-          type="button"
-          className="text-link mt-6"
-          onClick={() => setState("idle")}
-        >
-          Send another message
+        <button type="button" className="text-link mt-8" onClick={() => setState("idle")}>
+          Send another enquiry
         </button>
       </div>
     );
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="editorial-border bg-[#faf8f4] p-8 md:p-10"
-      noValidate
-    >
-      <div className="grid gap-6 md:grid-cols-2">
+    <form onSubmit={handleSubmit} className="max-w-2xl" noValidate>
+      <div className="grid gap-10 md:grid-cols-2">
         <div>
-          <label htmlFor="name" className="block text-sm text-warm-grey">
+          <label htmlFor="name" className="section-label">
             Name
           </label>
           <input
@@ -101,11 +93,11 @@ export function ContactForm() {
             required
             autoComplete="name"
             onFocus={handleFocus}
-            className="mt-2 w-full border-b border-border-warm bg-transparent py-2 text-charcoal outline-none focus:border-charcoal"
+            className="input-field mt-3"
           />
         </div>
         <div>
-          <label htmlFor="business" className="block text-sm text-warm-grey">
+          <label htmlFor="business" className="section-label">
             Business name
           </label>
           <input
@@ -114,11 +106,11 @@ export function ContactForm() {
             type="text"
             required
             onFocus={handleFocus}
-            className="mt-2 w-full border-b border-border-warm bg-transparent py-2 text-charcoal outline-none focus:border-charcoal"
+            className="input-field mt-3"
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm text-warm-grey">
+          <label htmlFor="email" className="section-label">
             Email
           </label>
           <input
@@ -128,38 +120,40 @@ export function ContactForm() {
             required
             autoComplete="email"
             onFocus={handleFocus}
-            className="mt-2 w-full border-b border-border-warm bg-transparent py-2 text-charcoal outline-none focus:border-charcoal"
+            className="input-field mt-3"
           />
         </div>
         <div>
-          <label htmlFor="website" className="block text-sm text-warm-grey">
-            Website <span className="text-warm-grey/70">(optional)</span>
+          <label htmlFor="website" className="section-label">
+            Website
           </label>
           <input
             id="website"
             name="website"
             type="url"
+            placeholder="Optional"
             onFocus={handleFocus}
-            className="mt-2 w-full border-b border-border-warm bg-transparent py-2 text-charcoal outline-none focus:border-charcoal"
+            className="input-field mt-3"
           />
         </div>
       </div>
 
-      <div className="mt-6">
-        <label htmlFor="message" className="block text-sm text-warm-grey">
-          Message <span className="text-warm-grey/70">(optional)</span>
+      <div className="mt-10">
+        <label htmlFor="message" className="section-label">
+          Message
         </label>
         <textarea
           id="message"
           name="message"
-          rows={4}
+          rows={3}
+          placeholder="Optional"
           onFocus={handleFocus}
-          className="mt-2 w-full resize-y border-b border-border-warm bg-transparent py-2 text-charcoal outline-none focus:border-charcoal"
+          className="input-field mt-3 resize-none"
         />
       </div>
 
       {state === "error" && (
-        <p className="mt-4 text-sm text-red-800" role="alert">
+        <p className="mt-6 text-sm text-red-800" role="alert">
           {errorMessage}
         </p>
       )}
@@ -167,9 +161,9 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={state === "loading"}
-        className="btn-primary mt-8 disabled:opacity-60"
+        className="btn-primary mt-12 disabled:opacity-60"
       >
-        {state === "loading" ? "Sending…" : "I'm interested"}
+        {state === "loading" ? "Sending…" : "Start a conversation"}
       </button>
     </form>
   );
