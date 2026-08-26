@@ -44,7 +44,7 @@ type MemorialDemoProps = {
 export function MemorialDemo({ onReturn }: MemorialDemoProps) {
   return (
     <article
-      className="mx-auto max-w-[1180px] bg-memorial-cream px-5 py-8 md:px-10 md:py-10"
+      className="mx-auto max-w-[1180px] bg-memorial-panel px-5 py-8 md:px-10 md:py-10"
       aria-label="Margaret Eleanor Campbell memorial concept preview"
     >
       <div className="grid gap-8 md:grid-cols-[40%_60%] md:items-start">
@@ -58,14 +58,14 @@ export function MemorialDemo({ onReturn }: MemorialDemoProps) {
           />
         </div>
         <div className="md:pt-2">
-          <h3 className="font-serif text-3xl leading-tight text-charcoal md:text-4xl">
+          <h3 className="font-serif text-3xl leading-tight text-ivory md:text-4xl">
             Margaret Eleanor Campbell
           </h3>
-          <p className="mt-1 text-warm-grey">1941 — 2025</p>
-          <p className="mt-4 font-serif text-xl text-charcoal">
+          <p className="mt-1 text-ivory/55">1941 — 2025</p>
+          <p className="mt-4 font-serif text-xl text-ivory">
             Margaret made every room feel warmer.
           </p>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-warm-grey">
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-ivory/65">
             Margaret was born in Edinburgh in 1941, the eldest of three sisters. She met James
             at a dance in Portobello and they made a home filled with music, flowers and
             conversation. Together they raised a family and, in 1985, opened Campbell Florists —
@@ -81,10 +81,10 @@ export function MemorialDemo({ onReturn }: MemorialDemoProps) {
           {timeline.map((item, i) => (
             <li
               key={item.year}
-              className={`grid grid-cols-[4rem_1fr] gap-4 py-3 text-[0.95rem] ${i > 0 ? "border-t border-border-warm" : ""}`}
+              className={`grid grid-cols-[4rem_1fr] gap-4 py-3 text-[0.95rem] ${i > 0 ? "border-t border-ivory/12" : ""}`}
             >
               <span className="font-serif text-bronze">{item.year}</span>
-              <span className="text-charcoal">{item.event}</span>
+              <span className="text-ivory/80">{item.event}</span>
             </li>
           ))}
         </ol>
@@ -103,59 +103,57 @@ export function MemorialDemo({ onReturn }: MemorialDemoProps) {
           <Image src="/images/margaret/travel.webp" alt="Margaret in Florence, 2012" fill className="object-cover" sizes="55vw" />
         </div>
         <div>
-          <p className="section-label">Concept feature</p>
-          <p className="mt-2 font-serif text-lg text-charcoal">Margaret, 1987</p>
-          <p className="font-serif text-xl text-charcoal">How I met James</p>
+          <p className="section-label text-bronze">Concept feature</p>
+          <p className="mt-2 font-serif text-lg text-ivory">Margaret, 1987</p>
+          <p className="font-serif text-xl text-ivory">How I met James</p>
           <button
             type="button"
-            className="mt-4 flex w-full items-center gap-3 border-t border-border-warm pt-4 text-left"
+            className="mt-4 flex w-full items-center gap-3 border-t border-ivory/15 pt-4 text-left"
             onClick={() => trackEvent(ANALYTICS_EVENTS.demoAudioClicked)}
             aria-label="Play audio preview — concept only"
           >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-charcoal text-charcoal">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-ivory/50 text-ivory">
               ▶
             </span>
             <div className="min-w-0 flex-1">
               <Waveform />
-              <p className="mt-1 text-sm text-warm-grey">2:14</p>
+              <p className="mt-1 text-sm text-ivory/50">2:14</p>
             </div>
           </button>
           <ul className="mt-6 space-y-4">
             {memories.map((m) => (
               <li key={m.quote}>
-                <blockquote className="font-serif text-lg leading-snug text-charcoal">
+                <blockquote className="font-serif text-lg leading-snug text-ivory">
                   &ldquo;{m.quote}&rdquo;
                 </blockquote>
-                <p className="mt-1 text-sm text-warm-grey">{m.author}</p>
+                <p className="mt-1 text-sm text-ivory/50">{m.author}</p>
               </li>
             ))}
           </ul>
         </div>
       </div>
 
-      <div className="mt-8 border-t border-border-warm pt-5">
-        <p className="font-serif text-lg text-charcoal">The things that made Margaret, Margaret.</p>
-        <p className="mt-3 text-warm-grey">
+      <div className="mt-8 border-t border-ivory/15 pt-5">
+        <p className="font-serif text-lg text-ivory">The things that made Margaret, Margaret.</p>
+        <p className="mt-3 text-ivory/60">
           {favourites.join("  ·  ")}
         </p>
       </div>
 
-      <div className="mt-8 border-t border-border-warm pt-6">
-        <h4 className="font-serif text-2xl leading-snug text-charcoal md:text-3xl">
-          The technology should disappear. The person should remain.
-        </h4>
-        <p className="mt-3 text-warm-grey">
-          The QR code is only the bridge. The story is the product.
-        </p>
-        <p className="mt-5 font-serif text-lg text-charcoal">
+      <div className="mt-8 border-t border-ivory/15 pt-6">
+        <p className="font-serif text-lg text-ivory">
           Families bring the memories. LifeMarked helps shape the story.
         </p>
-        <p className="mt-2 text-base text-warm-grey">
+        <p className="mt-2 text-base text-ivory/60">
           Photographs, eulogies, recordings and memories can be brought together into
           one beautifully structured life story.
         </p>
         {onReturn && (
-          <button type="button" className="text-link mt-5" onClick={onReturn}>
+          <button
+            type="button"
+            className="mt-5 text-sm text-ivory underline decoration-ivory/30 underline-offset-4 hover:decoration-ivory"
+            onClick={onReturn}
+          >
             Return to the memorial
           </button>
         )}

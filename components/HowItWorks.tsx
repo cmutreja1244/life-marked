@@ -19,7 +19,7 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="section-pad border-t border-border-warm">
+    <section id="how-it-works" className="section-pad border-t border-border-warm bg-ivory">
       <div className="content-width grid gap-0 md:grid-cols-3">
         {steps.map((step, index) => (
           <div

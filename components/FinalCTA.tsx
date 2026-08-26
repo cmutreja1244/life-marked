@@ -5,10 +5,10 @@ import { ContactForm } from "./ContactForm";
 
 export function FinalCTA() {
   return (
-    <section id="contact" className="bg-ivory">
-      <div className="content-width pt-12 md:pt-24">
-        <div className="mx-auto max-w-[900px] text-center">
-          <h2 className="font-serif text-[2.25rem] leading-none text-charcoal md:text-[4.25rem]">
+    <>
+      <section className="bg-ivory">
+        <div className="content-width py-16 text-center md:py-[96px]">
+          <h2 className="mx-auto max-w-[900px] font-serif text-[2.25rem] leading-none text-charcoal md:text-[4.25rem]">
             Their name deserves to be remembered.
             <br />
             Their story deserves to be known.
@@ -21,25 +21,24 @@ export function FinalCTA() {
             Become a launch partner
           </a>
         </div>
-      </div>
+      </section>
 
-      <div
-        id="enquiry-form"
-        className="content-width mt-10 border-t border-border-warm pt-10 pb-16"
-      >
-        <div className="grid gap-8 md:grid-cols-[35%_65%] md:gap-12">
-          <div>
-            <h2 className="font-serif text-[1.85rem] leading-tight text-charcoal md:text-[2.25rem]">
-              Start a conversation.
-            </h2>
-            <p className="mt-4 text-warm-grey">
-              If you sell memorials and would be interested in offering LifeMarked to your
-              customers, we&apos;d love to hear from you.
-            </p>
+      <section id="contact" className="bg-stone">
+        <div id="enquiry-form" className="content-width py-12 md:py-16">
+          <div className="grid gap-8 md:grid-cols-[35%_65%] md:gap-12">
+            <div>
+              <h2 className="font-serif text-[1.85rem] leading-tight text-charcoal md:text-[2.25rem]">
+                Start a conversation.
+              </h2>
+              <p className="mt-4 text-warm-grey">
+                If you sell memorials and would be interested in offering LifeMarked to your
+                customers, we&apos;d love to hear from you.
+              </p>
+            </div>
+            <ContactForm />
           </div>
-          <ContactForm />
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

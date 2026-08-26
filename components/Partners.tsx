@@ -76,7 +76,7 @@ export function Partners() {
           </p>
           <a
             href="#contact"
-            className="btn-primary mt-6 inline-flex bg-ivory text-charcoal hover:bg-ivory/90"
+            className="btn-on-dark mt-6 inline-flex"
             onClick={() => trackEvent(ANALYTICS_EVENTS.partnerSectionCta)}
           >
             Become a launch partner

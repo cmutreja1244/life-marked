@@ -2,22 +2,24 @@
 
 :root {
   --ivory: #f4f0e8;
+  --stone: #e6dfd3;
   --charcoal: #242422;
   --warm-grey: #6e6a63;
   --bronze: #8c7456;
   --deep-charcoal: #1d1d1b;
+  --memorial-panel: #252522;
   --border-warm: rgba(110, 106, 99, 0.22);
-  --memorial-cream: #faf8f4;
 }
 
 @theme inline {
   --color-ivory: var(--ivory);
+  --color-stone: var(--stone);
+  --color-memorial-panel: var(--memorial-panel);
   --color-charcoal: var(--charcoal);
   --color-warm-grey: var(--warm-grey);
   --color-bronze: var(--bronze);
   --color-deep-charcoal: var(--deep-charcoal);
   --color-border-warm: var(--border-warm);
-  --color-memorial-cream: var(--memorial-cream);
   --font-sans: var(--font-geist-sans);
   --font-serif: var(--font-instrument-serif);
 }
@@ -127,6 +129,25 @@ body {
   outline-offset: 3px;
 }
 
+.btn-on-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0.625rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--charcoal);
+  background: var(--ivory);
+  border: 1px solid var(--ivory);
+  border-radius: 6px;
+}
+
+.btn-on-dark:hover {
+  background: #ebe6dc;
+}
+
 .text-link {
   font-size: 0.9375rem;
   font-weight: 500;
@@ -155,10 +176,11 @@ body {
 
 .input-field {
   width: 100%;
-  height: 52px;
-  border: none;
-  border-bottom: 1px solid var(--border-warm);
+  height: 54px;
+  border: 1px solid rgba(36, 36, 34, 0.18);
+  border-radius: 5px;
   background: transparent;
+  padding: 0 0.85rem;
   font-size: 1rem;
   color: var(--charcoal);
   outline: none;

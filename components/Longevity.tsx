@@ -15,13 +15,13 @@ const points = [
 
 export function Longevity() {
   return (
-    <section className="section-pad bg-deep-charcoal text-ivory">
+    <section className="bg-ivory py-12 md:py-[72px]">
       <div className="content-width grid gap-8 md:grid-cols-[42%_58%] md:items-start md:gap-12">
         <div>
-          <h2 className="font-serif text-[1.85rem] leading-tight md:text-[2.5rem]">
+          <h2 className="font-serif text-[1.75rem] leading-tight text-charcoal md:text-[2.25rem]">
             Built for memories that matter.
           </h2>
-          <p className="mt-4 text-ivory/70">
+          <p className="mt-3 text-warm-grey">
             Families should never be trapped inside a proprietary memorial platform.
           </p>
         </div>
@@ -29,12 +29,10 @@ export function Longevity() {
           {points.map((point, i) => (
             <div
               key={point.title}
-              className={`py-5 ${i > 0 ? "border-t border-ivory/15" : ""}`}
+              className={`py-4 ${i > 0 ? "border-t border-border-warm" : ""}`}
             >
-              <p className="text-ivory">
-                <span className="font-serif text-lg">{point.title}</span>
-                <span className="text-ivory/60"> — {point.text}</span>
-              </p>
+              <p className="font-serif text-lg text-charcoal">{point.title}</p>
+              <p className="mt-1 text-sm text-warm-grey">{point.text}</p>
             </div>
           ))}
         </div>

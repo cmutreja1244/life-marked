@@ -20,8 +20,8 @@ const locations = [
 
 export function MemorialLocations() {
   return (
-    <section className="section-pad-md border-t border-border-warm">
-      <div className="content-width">
+    <section className="bg-ivory">
+      <div className="content-width section-pad-md">
         <h2 className="max-w-xl font-serif text-[2rem] leading-tight text-charcoal md:text-[3rem]">
           Stories can live wherever memories do.
         </h2>
@@ -29,7 +29,7 @@ export function MemorialLocations() {
           From headstones and benches to gardens, plaques and places with personal meaning.
         </p>
 
-        <div className="mt-10 grid h-auto gap-4 md:h-[660px] md:grid-cols-[58%_42%] md:grid-rows-2">
+        <div className="mt-10 grid h-auto gap-3 md:h-[660px] md:grid-cols-[58%_42%] md:grid-rows-2 md:gap-4">
           <figure className="relative min-h-[280px] overflow-hidden img-radius md:row-span-2 md:min-h-0">
             <Image
               src={locations[0].src}
