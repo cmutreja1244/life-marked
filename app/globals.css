@@ -1,26 +1,115 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ivory: #f4f0e8;
+  --charcoal: #242422;
+  --warm-grey: #6e6a63;
+  --bronze: #8c7456;
+  --deep-charcoal: #1d1d1b;
+  --border-warm: rgba(110, 106, 99, 0.22);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-ivory: var(--ivory);
+  --color-charcoal: var(--charcoal);
+  --color-warm-grey: var(--warm-grey);
+  --color-bronze: var(--bronze);
+  --color-deep-charcoal: var(--deep-charcoal);
+  --color-border-warm: var(--border-warm);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-instrument-serif);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ivory);
+  color: var(--charcoal);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+::selection {
+  background: rgba(140, 116, 86, 0.25);
+}
+
+.font-serif {
+  font-family: var(--font-instrument-serif), "Times New Roman", serif;
+}
+
+.prose-width {
+  max-width: 42rem;
+}
+
+.content-width {
+  max-width: 80rem;
+}
+
+.section-padding {
+  padding-block: clamp(4rem, 10vw, 7rem);
+  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.editorial-border {
+  border: 1px solid var(--border-warm);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.625rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--ivory);
+  background: var(--charcoal);
+  border: 1px solid var(--charcoal);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--deep-charcoal);
+}
+
+.btn-primary:focus-visible {
+  outline: 2px solid var(--bronze);
+  outline-offset: 2px;
+}
+
+.text-link {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--charcoal);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  text-decoration-color: rgba(36, 36, 34, 0.35);
+  transition: text-decoration-color 0.2s ease;
+}
+
+.text-link:hover {
+  text-decoration-color: var(--bronze);
+}
+
+.text-link:focus-visible {
+  outline: 2px solid var(--bronze);
+  outline-offset: 2px;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--warm-grey);
 }
