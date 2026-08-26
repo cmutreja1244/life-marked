@@ -68,11 +68,11 @@ export function ContactForm() {
 
   if (state === "success") {
     return (
-      <div className="py-4">
-        <p className="font-serif text-3xl text-charcoal">
+      <div>
+        <p className="font-serif text-2xl text-charcoal">
           Thank you. We&apos;ll be in touch shortly.
         </p>
-        <button type="button" className="text-link mt-8" onClick={() => setState("idle")}>
+        <button type="button" className="text-link mt-4" onClick={() => setState("idle")}>
           Send another enquiry
         </button>
       </div>
@@ -80,10 +80,10 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl" noValidate>
-      <div className="grid gap-10 md:grid-cols-2">
+    <form onSubmit={handleSubmit} noValidate>
+      <div className="grid gap-5 md:grid-cols-2">
         <div>
-          <label htmlFor="name" className="section-label">
+          <label htmlFor="name" className="section-label mb-2 block">
             Name
           </label>
           <input
@@ -93,11 +93,11 @@ export function ContactForm() {
             required
             autoComplete="name"
             onFocus={handleFocus}
-            className="input-field mt-3"
+            className="input-field"
           />
         </div>
         <div>
-          <label htmlFor="business" className="section-label">
+          <label htmlFor="business" className="section-label mb-2 block">
             Business name
           </label>
           <input
@@ -106,11 +106,11 @@ export function ContactForm() {
             type="text"
             required
             onFocus={handleFocus}
-            className="input-field mt-3"
+            className="input-field"
           />
         </div>
         <div>
-          <label htmlFor="email" className="section-label">
+          <label htmlFor="email" className="section-label mb-2 block">
             Email
           </label>
           <input
@@ -120,11 +120,11 @@ export function ContactForm() {
             required
             autoComplete="email"
             onFocus={handleFocus}
-            className="input-field mt-3"
+            className="input-field"
           />
         </div>
         <div>
-          <label htmlFor="website" className="section-label">
+          <label htmlFor="website" className="section-label mb-2 block">
             Website
           </label>
           <input
@@ -133,27 +133,26 @@ export function ContactForm() {
             type="url"
             placeholder="Optional"
             onFocus={handleFocus}
-            className="input-field mt-3"
+            className="input-field"
           />
         </div>
       </div>
 
-      <div className="mt-10">
-        <label htmlFor="message" className="section-label">
+      <div className="mt-5">
+        <label htmlFor="message" className="section-label mb-2 block">
           Message
         </label>
         <textarea
           id="message"
           name="message"
-          rows={3}
           placeholder="Optional"
           onFocus={handleFocus}
-          className="input-field mt-3 resize-none"
+          className="input-field"
         />
       </div>
 
       {state === "error" && (
-        <p className="mt-6 text-sm text-red-800" role="alert">
+        <p className="mt-4 text-sm text-red-800" role="alert">
           {errorMessage}
         </p>
       )}
@@ -161,7 +160,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={state === "loading"}
-        className="btn-primary mt-12 disabled:opacity-60"
+        className="btn-primary mt-6 disabled:opacity-60"
       >
         {state === "loading" ? "Sending…" : "Send enquiry"}
       </button>

@@ -1,24 +1,44 @@
 "use client";
 
 import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics";
+import { ContactForm } from "./ContactForm";
 
 export function FinalCTA() {
   return (
-    <section className="space-section-xl bg-ivory text-center">
-      <div className="content-width mx-auto px-5 md:px-10">
-        <h2 className="mx-auto max-w-3xl font-serif text-3xl leading-tight text-charcoal md:text-5xl">
-          Their name deserves to be remembered.
-        </h2>
-        <h2 className="mx-auto mt-4 max-w-3xl font-serif text-3xl leading-tight text-charcoal md:text-5xl">
-          Their story deserves to be known.
-        </h2>
-        <a
-          href="#contact"
-          className="btn-primary mt-14 inline-flex"
-          onClick={() => trackEvent(ANALYTICS_EVENTS.finalCtaClicked)}
-        >
-          Become a launch partner
-        </a>
+    <section id="contact" className="bg-ivory">
+      <div className="content-width pt-12 md:pt-24">
+        <div className="mx-auto max-w-[900px] text-center">
+          <h2 className="font-serif text-[2.25rem] leading-none text-charcoal md:text-[4.25rem]">
+            Their name deserves to be remembered.
+            <br />
+            Their story deserves to be known.
+          </h2>
+          <a
+            href="#enquiry-form"
+            className="btn-primary mt-8 inline-flex"
+            onClick={() => trackEvent(ANALYTICS_EVENTS.finalCtaClicked)}
+          >
+            Become a launch partner
+          </a>
+        </div>
+      </div>
+
+      <div
+        id="enquiry-form"
+        className="content-width mt-10 border-t border-border-warm pt-10 pb-16"
+      >
+        <div className="grid gap-8 md:grid-cols-[35%_65%] md:gap-12">
+          <div>
+            <h2 className="font-serif text-[1.85rem] leading-tight text-charcoal md:text-[2.25rem]">
+              Start a conversation.
+            </h2>
+            <p className="mt-4 text-warm-grey">
+              If you sell memorials and would be interested in offering LifeMarked to your
+              customers, we&apos;d love to hear from you.
+            </p>
+          </div>
+          <ContactForm />
+        </div>
       </div>
     </section>
   );

@@ -14,42 +14,42 @@ export function PhysicalProduct() {
   const current = finishes.find((f) => f.id === active) ?? finishes[0];
 
   return (
-    <section className="space-section-lg border-t border-border-warm">
-      <div className="content-width mx-auto">
-        <h2 className="font-serif text-3xl leading-tight text-charcoal md:text-[2.65rem]">
-          Designed to belong.
-        </h2>
-        <p className="mt-5 max-w-lg text-warm-grey">
-          A LifeMarked marker should feel part of the memorial, not something added afterwards.
-        </p>
-
-        <div className="relative mt-12 aspect-[16/10] max-h-[520px] w-full md:aspect-[2/1]">
+    <section className="section-pad-md border-t border-border-warm">
+      <div className="content-width grid items-center gap-8 md:grid-cols-[58%_42%] md:gap-12">
+        <div className="relative aspect-[16/10] w-full overflow-hidden img-radius md:aspect-auto md:h-[480px]">
           <Image
             key={current.id}
             src={current.image}
             alt={`LifeMarked marker — ${current.label}`}
             fill
             className="object-cover"
-            sizes="(max-width: 1024px) 100vw, 76rem"
+            sizes="(max-width: 768px) 100vw, 58vw"
           />
         </div>
 
-        <div className="mt-8 flex flex-wrap gap-8 border-t border-border-warm pt-6">
-          {finishes.map((finish) => (
-            <button
-              key={finish.id}
-              type="button"
-              onClick={() => setActive(finish.id)}
-              className={`text-left text-sm transition-colors ${
-                active === finish.id ? "text-charcoal" : "text-warm-grey hover:text-charcoal"
-              }`}
-            >
-              {finish.label}
-            </button>
-          ))}
+        <div>
+          <h2 className="font-serif text-[2rem] leading-tight text-charcoal md:text-[3rem]">
+            Designed to belong.
+          </h2>
+          <p className="mt-4 text-lg text-warm-grey">
+            A LifeMarked marker should feel part of the memorial, not something added afterwards.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+            {finishes.map((finish) => (
+              <button
+                key={finish.id}
+                type="button"
+                onClick={() => setActive(finish.id)}
+                className={`text-left text-sm ${
+                  active === finish.id ? "text-charcoal underline underline-offset-4" : "text-warm-grey"
+                }`}
+              >
+                {finish.label}
+              </button>
+            ))}
+          </div>
+          <p className="section-label mt-5">Concept finishes</p>
         </div>
-
-        <p className="section-label mt-6">Concept finishes</p>
       </div>
     </section>
   );
