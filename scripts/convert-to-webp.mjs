@@ -8,14 +8,15 @@ const margaretDir = join(publicDir, "margaret");
 
 const assetMap = {
   "hero-margaret-memorial.png": "hero-margaret-memorial.webp",
-  "margaret-memorial-close.png": "margaret-memorial-close.webp",
+  "margaret-memorial-close-v2.png": "margaret-memorial-close.webp",
+  "plaque-product.png": "plaque-product.webp",
   "bench-memorial-v2.png": "bench-memorial.webp",
   "garden-memorial.png": "garden-memorial.webp",
-  "partner-showroom.png": "partner-showroom.webp",
+  "partner-display.png": "partner-display.webp",
   "finish-steel.png": "finish-steel.webp",
   "finish-bronze.png": "finish-bronze.webp",
   "finish-dark.png": "finish-dark.webp",
-  "hero-memorial.png": "headstone-memorial.webp",
+  "margaret-florist.png": "margaret/florist.webp",
   "og-image.png": "og-image.webp",
 };
 

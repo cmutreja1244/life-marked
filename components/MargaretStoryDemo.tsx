@@ -16,7 +16,7 @@ export function MargaretStoryDemo() {
     setPhase("scan");
     trackEvent(ANALYTICS_EVENTS.demoOpened);
     if (!reduceMotion) {
-      window.setTimeout(() => setPhase("story"), 1400);
+      window.setTimeout(() => setPhase("story"), 1200);
     }
   };
 
@@ -26,67 +26,63 @@ export function MargaretStoryDemo() {
   };
 
   return (
-    <section id="memorials" className="relative">
+    <section id="memorials" className="relative bg-ivory">
       <AnimatePresence mode="wait">
         {phase !== "story" ? (
-          <motion.div
-            key="physical"
-            initial={false}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="relative min-h-[70vh] md:min-h-[85vh]">
+          <motion.div key="physical" exit={{ opacity: 0 }} transition={{ duration: 0.5 }}>
+            <div className="space-section-md border-t border-border-warm">
+              <div className="content-width mx-auto mb-10 max-w-xl">
+                <p className="section-label">Concept preview</p>
+                <h2 className="mt-3 font-serif text-3xl text-charcoal md:text-5xl">Meet Margaret.</h2>
+                <p className="mt-4 text-lg text-warm-grey">
+                  A name on stone. A whole life behind it.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative min-h-[65vh] md:min-h-[78vh]">
               <Image
                 src="/images/margaret-memorial-close.webp"
-                alt="Margaret Campbell's memorial with a discreet LifeMarked marker at the base"
+                alt="Margaret Eleanor Campbell's memorial with a discreet LifeMarked marker"
                 fill
-                className="object-cover object-[center_55%]"
+                className="object-cover object-center"
                 sizes="100vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-deep-charcoal/80 via-deep-charcoal/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-deep-charcoal/75 via-transparent to-transparent" />
 
               {phase === "scan" && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="absolute bottom-[22%] left-[38%] h-14 w-14 md:bottom-[24%] md:left-[42%] md:h-16 md:w-16"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute bottom-[28%] right-[18%] h-12 w-12 border border-ivory/70 md:bottom-[30%] md:right-[22%] md:h-14 md:w-14"
                   aria-hidden
-                >
-                  <div className="absolute inset-0 rounded-sm border border-ivory/60 bg-ivory/10 ring-[6px] ring-ivory/20 backdrop-blur-sm" />
-                  <div className="absolute -inset-4 animate-pulse rounded-sm border border-bronze/40" />
-                </motion.div>
+                />
               )}
 
               <div className="absolute inset-x-0 bottom-0 space-section-md">
                 <div className="content-width mx-auto">
-                  <p className="section-label text-ivory/50">Concept preview</p>
-                  <h2 className="mt-3 max-w-lg font-serif text-3xl leading-tight text-ivory md:text-5xl">
-                    A memorial can tell a story.
-                  </h2>
-
                   {phase === "memorial" && (
-                    <motion.div
-                      initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center"
-                    >
+                    <div className="flex flex-col items-start gap-4">
                       <button
                         type="button"
                         className="btn-primary bg-ivory text-charcoal hover:bg-ivory/90"
                         onClick={discover}
                       >
-                        Discover Margaret
+                        Discover Margaret&apos;s story
                       </button>
                       {reduceMotion && (
-                        <button type="button" className="btn-ghost-light" onClick={openStory}>
-                          Explore her story
+                        <button
+                          type="button"
+                          className="btn-primary bg-ivory text-charcoal hover:bg-ivory/90"
+                          onClick={openStory}
+                        >
+                          Discover Margaret&apos;s story
                         </button>
                       )}
-                    </motion.div>
+                    </div>
                   )}
-
                   {phase === "scan" && !reduceMotion && (
-                    <p className="mt-8 text-ivory/70">Opening Margaret&apos;s story…</p>
+                    <p className="text-ivory/80">Opening Margaret&apos;s story…</p>
                   )}
                 </div>
               </div>
@@ -97,26 +93,10 @@ export function MargaretStoryDemo() {
             key="digital"
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.7 }}
+            className="mx-auto w-full max-w-[85vw] md:max-w-[min(85vw,72rem)]"
           >
-            <MemorialDemo />
-            <div className="space-section-lg bg-ivory text-center">
-              <blockquote className="mx-auto max-w-3xl px-5 font-serif text-2xl leading-snug text-charcoal md:text-4xl md:leading-tight">
-                The technology should disappear.
-                <br className="hidden md:block" /> The person should remain.
-              </blockquote>
-              <p className="reading-width mx-auto mt-6 text-warm-grey">
-                The marker is simply the bridge. LifeMarked is designed around
-                the story it reveals.
-              </p>
-              <button
-                type="button"
-                className="text-link mt-10"
-                onClick={() => setPhase("memorial")}
-              >
-                Return to the memorial
-              </button>
-            </div>
+            <MemorialDemo onReturn={() => setPhase("memorial")} />
           </motion.div>
         )}
       </AnimatePresence>

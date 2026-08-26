@@ -163,7 +163,7 @@ export function ContactForm() {
         disabled={state === "loading"}
         className="btn-primary mt-12 disabled:opacity-60"
       >
-        {state === "loading" ? "Sending…" : "Start a conversation"}
+        {state === "loading" ? "Sending…" : "Send enquiry"}
       </button>
     </form>
   );

@@ -4,24 +4,9 @@ import Image from "next/image";
 import { useState } from "react";
 
 const finishes = [
-  {
-    id: "steel",
-    name: "Stone / Silver",
-    description: "Brushed stainless steel.",
-    image: "/images/finish-steel.webp",
-  },
-  {
-    id: "heritage",
-    name: "Heritage",
-    description: "Muted brass or bronze.",
-    image: "/images/finish-bronze.webp",
-  },
-  {
-    id: "discreet",
-    name: "Discreet",
-    description: "Dark engraved finish.",
-    image: "/images/finish-dark.webp",
-  },
+  { id: "steel", label: "Brushed steel", image: "/images/plaque-product.webp" },
+  { id: "bronze", label: "Aged bronze", image: "/images/finish-bronze.webp" },
+  { id: "dark", label: "Dark engraved", image: "/images/finish-dark.webp" },
 ];
 
 export function PhysicalProduct() {
@@ -29,54 +14,42 @@ export function PhysicalProduct() {
   const current = finishes.find((f) => f.id === active) ?? finishes[0];
 
   return (
-    <section className="space-section-xl bg-deep-charcoal text-ivory">
+    <section className="space-section-lg border-t border-border-warm">
       <div className="content-width mx-auto">
-        <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
-          <div>
-            <h2 className="font-serif text-3xl leading-tight md:text-4xl">
-              Designed to belong.
-            </h2>
-            <p className="mt-5 max-w-sm text-ivory/65">
-              A marker quiet enough to sit on a premium memorial — elegant enough
-              to stay there permanently.
-            </p>
-            <p className="section-label mt-10 text-ivory/40">Concept finishes</p>
-          </div>
+        <h2 className="font-serif text-3xl leading-tight text-charcoal md:text-[2.65rem]">
+          Designed to belong.
+        </h2>
+        <p className="mt-5 max-w-lg text-warm-grey">
+          A LifeMarked marker should feel part of the memorial, not something added afterwards.
+        </p>
 
-          <div className="relative aspect-[16/10] overflow-hidden md:aspect-[2/1]">
-            <Image
-              key={current.id}
-              src={current.image}
-              alt={`LifeMarked marker — ${current.name}`}
-              fill
-              className="object-cover transition-opacity duration-500"
-              sizes="(max-width: 1024px) 100vw, 60vw"
-            />
-          </div>
+        <div className="relative mt-12 aspect-[16/10] max-h-[520px] w-full md:aspect-[2/1]">
+          <Image
+            key={current.id}
+            src={current.image}
+            alt={`LifeMarked marker — ${current.label}`}
+            fill
+            className="object-cover"
+            sizes="(max-width: 1024px) 100vw, 76rem"
+          />
         </div>
 
-        <div className="mt-10 flex flex-wrap gap-6 border-t border-ivory/10 pt-8 md:gap-12">
+        <div className="mt-8 flex flex-wrap gap-8 border-t border-border-warm pt-6">
           {finishes.map((finish) => (
             <button
               key={finish.id}
               type="button"
               onClick={() => setActive(finish.id)}
-              className={`text-left transition-opacity ${active === finish.id ? "opacity-100" : "opacity-45 hover:opacity-70"}`}
+              className={`text-left text-sm transition-colors ${
+                active === finish.id ? "text-charcoal" : "text-warm-grey hover:text-charcoal"
+              }`}
             >
-              <p className="font-serif text-lg">{finish.name}</p>
-              <p className="mt-1 text-sm text-ivory/55">{finish.description}</p>
+              {finish.label}
             </button>
           ))}
         </div>
 
-        <div className="mt-12 flex items-center gap-4 border-t border-ivory/10 pt-8">
-          <div className="flex h-10 w-10 items-center justify-center border border-ivory/30 font-serif text-sm">
-            LM
-          </div>
-          <p className="text-sm text-ivory/50">
-            LifeMarked wordmark and monogram — concept mark, engravable at small scale.
-          </p>
-        </div>
+        <p className="section-label mt-6">Concept finishes</p>
       </div>
     </section>
   );
