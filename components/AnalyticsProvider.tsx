@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { track, Analytics as VercelAnalytics } from "@vercel/analytics/react";
+import { track } from "@vercel/analytics";
 import type { AnalyticsEvent } from "@/lib/analytics";
 
 export function AnalyticsProvider() {
@@ -15,5 +15,5 @@ export function AnalyticsProvider() {
     return () => window.removeEventListener("lifemarked:analytics", handler);
   }, []);
 
-  return <VercelAnalytics />;
+  return null;
 }

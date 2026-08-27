@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Instrument_Serif } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { COMPANY } from "@/lib/company";
 import "./globals.css";
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full bg-ivory text-charcoal">
         {children}
+        <Analytics />
         <AnalyticsProvider />
       </body>
     </html>
