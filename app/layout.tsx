@@ -41,6 +41,10 @@ export const metadata: Metadata = {
     images: ["/images/og-image.webp"],
   },
   robots: { index: true, follow: true },
+  icons: {
+    icon: [{ url: "/favicon.png", type: "image/png" }],
+    apple: [{ url: "/favicon.png", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

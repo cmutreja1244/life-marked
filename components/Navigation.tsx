@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { ANALYTICS_EVENTS, trackEvent } from "@/lib/analytics";
 
@@ -37,8 +38,15 @@ export function Navigation() {
         className="mx-auto flex h-14 max-w-[76rem] items-center justify-between px-5 md:h-16 md:px-10"
         aria-label="Main"
       >
-        <a href="#top" className="font-serif text-[1.2rem] tracking-tight text-charcoal">
-          LifeMarked
+        <a href="#top" className="flex items-center">
+          <Image
+            src="/Logo_Wide_NoBG.png"
+            alt="LifeMarked"
+            width={180}
+            height={40}
+            className="h-8 w-auto md:h-9"
+            priority
+          />
         </a>
 
         <div className="hidden items-center gap-8 md:flex">

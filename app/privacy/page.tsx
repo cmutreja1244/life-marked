@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -11,8 +12,14 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-ivory text-charcoal">
       <header className="border-b border-border-warm px-5 py-6 md:px-10">
         <div className="content-width mx-auto">
-          <Link href="/" className="font-serif text-xl">
-            LifeMarked
+          <Link href="/" className="inline-flex items-center">
+            <Image
+              src="/Logo_Wide_NoBG.png"
+              alt="LifeMarked"
+              width={180}
+              height={40}
+              className="h-8 w-auto"
+            />
           </Link>
         </div>
       </header>
