@@ -28,9 +28,8 @@ export default function PrivacyPage() {
         <article className="content-width prose-width mx-auto">
           <h1 className="font-serif text-3xl">Privacy</h1>
           <p className="mt-6 text-warm-grey">
-            LifeMarked is an AlbaNova concept website used to introduce the
-            product to memorial businesses. This page explains how we handle
-            information when you use this site.
+            LifeMarked is a digital memorial service from AlbaNova. This page
+            explains how we handle information when you use this site.
           </p>
 
           <h2 className="mt-10 font-serif text-xl">Information we collect</h2>
@@ -44,9 +43,9 @@ export default function PrivacyPage() {
 
           <h2 className="mt-10 font-serif text-xl">How we use it</h2>
           <p className="mt-4 text-warm-grey">
-            Contact form submissions are used to respond to enquiries about the
-            LifeMarked pilot and to follow up with memorial businesses who express
-            interest. We do not sell your information.
+            Contact form submissions are used to respond to enquiries from
+            memorial businesses and to follow up with those who get in touch. We
+            do not sell your information.
           </p>
 
           <h2 className="mt-10 font-serif text-xl">Analytics</h2>
@@ -67,7 +66,7 @@ export default function PrivacyPage() {
           <h2 className="mt-10 font-serif text-xl">Data retention</h2>
           <p className="mt-4 text-warm-grey">
             We retain contact enquiries for as long as needed to respond and
-            manage the LifeMarked pilot, unless a longer period is required by
+            manage partner relationships, unless a longer period is required by
             law or you ask us to delete your information sooner.
           </p>
 

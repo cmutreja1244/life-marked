@@ -21,7 +21,7 @@ export function Hero() {
               className="btn-primary"
               onClick={() => trackEvent(ANALYTICS_EVENTS.heroPartnerCta)}
             >
-              Become a launch partner
+              Become a partner
             </a>
             <a
               href="#how-it-works"

@@ -56,7 +56,7 @@ export function Partners() {
                 sizes="52vw"
               />
             </div>
-            <p className="section-label mt-3 text-ivory/40">Partner display concept</p>
+            <p className="section-label mt-3 text-ivory/40">Partner display</p>
           </div>
         </div>
 
@@ -79,15 +79,14 @@ export function Partners() {
 
         <div className="mt-8 text-center">
           <p className="mx-auto max-w-xl text-ivory/75">
-            We&apos;re inviting a small number of UK memorial businesses to help shape the
-            first LifeMarked pilot.
+            Work with LifeMarked to offer digital memorials alongside the work you already do.
           </p>
           <a
             href="#contact"
             className="btn-on-dark mt-6 inline-flex"
             onClick={() => trackEvent(ANALYTICS_EVENTS.partnerSectionCta)}
           >
-            Become a launch partner
+            Become a partner
           </a>
         </div>
       </div>

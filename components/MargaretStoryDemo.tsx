@@ -28,7 +28,7 @@ export function MargaretStoryDemo() {
           </div>
 
           <div className="order-1 md:order-2">
-            <p className="section-label text-bronze">Concept preview</p>
+            <p className="section-label text-bronze">A memorial story</p>
             <h2 className="mt-3 font-serif text-[2.25rem] leading-tight text-ivory md:text-[3.5rem]">
               Meet Margaret.
             </h2>

@@ -18,7 +18,7 @@ export function FinalCTA() {
             className="btn-primary mt-8 inline-flex"
             onClick={() => trackEvent(ANALYTICS_EVENTS.finalCtaClicked)}
           >
-            Become a launch partner
+            Become a partner
           </a>
         </div>
       </section>
@@ -31,8 +31,8 @@ export function FinalCTA() {
                 Start a conversation.
               </h2>
               <p className="mt-4 text-warm-grey">
-                If you sell memorials and would be interested in offering LifeMarked to your
-                customers, we&apos;d love to hear from you.
+                If you sell memorials and would like to offer LifeMarked to your customers,
+                we&apos;d love to hear from you.
               </p>
             </div>
             <ContactForm />

@@ -45,7 +45,7 @@ export function MemorialDemo({ onReturn }: MemorialDemoProps) {
   return (
     <article
       className="mx-auto max-w-[1180px] bg-memorial-panel px-5 py-8 md:px-10 md:py-10"
-      aria-label="Margaret Eleanor Campbell memorial concept preview"
+      aria-label="Margaret Eleanor Campbell memorial"
     >
       <div className="grid gap-8 md:grid-cols-[40%_60%] md:items-start">
         <div className="relative aspect-[4/5] overflow-hidden img-radius">
@@ -103,14 +103,14 @@ export function MemorialDemo({ onReturn }: MemorialDemoProps) {
           <Image src="/images/margaret/travel.webp" alt="Margaret in Florence, 2012" fill className="object-cover" sizes="55vw" />
         </div>
         <div>
-          <p className="section-label text-bronze">Concept feature</p>
+          <p className="section-label text-bronze">A recorded memory</p>
           <p className="mt-2 font-serif text-lg text-ivory">Margaret, 1987</p>
           <p className="font-serif text-xl text-ivory">How I met James</p>
           <button
             type="button"
             className="mt-4 flex w-full items-center gap-3 border-t border-ivory/15 pt-4 text-left"
             onClick={() => trackEvent(ANALYTICS_EVENTS.demoAudioClicked)}
-            aria-label="Play audio preview — concept only"
+            aria-label="Play audio preview"
           >
             <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-ivory/50 text-ivory">
               ▶
