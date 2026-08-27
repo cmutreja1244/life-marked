@@ -142,7 +142,7 @@ export function MemorialDemo({ onReturn }: MemorialDemoProps) {
 
       <div className="mt-8 border-t border-ivory/15 pt-6">
         <p className="font-serif text-lg text-ivory">
-          Families bring the memories. LifeMarked helps shape the story.
+          Families bring the memories. Life Marked helps shape the story.
         </p>
         <p className="mt-2 text-base text-ivory/60">
           Photographs, eulogies, recordings and memories can be brought together into

@@ -41,7 +41,7 @@ export function Navigation() {
         <a href="#top" className="flex items-center">
           <Image
             src="/Logo_Wide_NoBG.png"
-            alt="LifeMarked"
+            alt="Life Marked"
             width={180}
             height={40}
             className="h-8 w-auto md:h-9"

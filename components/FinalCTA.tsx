@@ -31,7 +31,7 @@ export function FinalCTA() {
                 Start a conversation.
               </h2>
               <p className="mt-4 text-warm-grey">
-                If you sell memorials and would like to offer LifeMarked to your customers,
+                If you sell memorials and would like to offer Life Marked to your customers,
                 we&apos;d love to hear from you.
               </p>
             </div>

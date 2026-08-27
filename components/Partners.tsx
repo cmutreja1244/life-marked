@@ -14,7 +14,7 @@ const benefits = [
   },
   {
     title: "Nothing technical to manage",
-    description: "LifeMarked handles the marker, setup and digital experience.",
+    description: "Life Marked handles the marker, setup and digital experience.",
   },
 ];
 
@@ -29,7 +29,7 @@ export function Partners() {
               A premium add-on for the memorials you already sell.
             </h2>
             <p className="mt-4 text-ivory/75">
-              Offer families a LifeMarked digital memorial alongside the headstone, plaque or
+              Offer families a Life Marked digital memorial alongside the headstone, plaque or
               bench they are already purchasing. We handle the digital experience. You introduce
               it.
             </p>
@@ -50,7 +50,7 @@ export function Partners() {
             <div className="relative aspect-[4/3] overflow-hidden img-radius">
               <Image
                 src="/images/partner-display.webp"
-                alt="Memorial showroom display with LifeMarked plaque sample and information card"
+                alt="Memorial showroom display with Life Marked plaque sample and information card"
                 fill
                 className="object-cover"
                 sizes="52vw"
@@ -62,8 +62,8 @@ export function Partners() {
 
         <div className="mt-12 grid gap-0 border-t border-ivory/12 pt-10 md:grid-cols-3">
           {[
-            { step: "01", title: "You offer it", detail: "Offer LifeMarked" },
-            { step: "02", title: "We handle it", detail: "LifeMarked handles fulfilment" },
+            { step: "01", title: "You offer it", detail: "Offer Life Marked" },
+            { step: "02", title: "We handle it", detail: "Life Marked handles fulfilment" },
             { step: "03", title: "You earn from it", detail: "Earn from every sale" },
           ].map((item, index) => (
             <div
@@ -79,7 +79,7 @@ export function Partners() {
 
         <div className="mt-8 text-center">
           <p className="mx-auto max-w-xl text-ivory/75">
-            Work with LifeMarked to offer digital memorials alongside the work you already do.
+            Work with Life Marked to offer digital memorials alongside the work you already do.
           </p>
           <a
             href="#contact"

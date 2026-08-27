@@ -2,7 +2,7 @@ const steps = [
   {
     number: "01",
     title: "Mark",
-    description: "A discreet LifeMarked marker is added to the memorial.",
+    description: "A discreet Life Marked marker is added to the memorial.",
   },
   {
     number: "02",

@@ -12,7 +12,7 @@ export function Hero() {
             Every life leaves more than a name.
           </h1>
           <p className="mt-7 max-w-md text-lg leading-relaxed text-warm-grey">
-            LifeMarked connects a physical memorial to the photographs, voices and
+            Life Marked connects a physical memorial to the photographs, voices and
             memories behind a life.
           </p>
           <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
@@ -36,7 +36,7 @@ export function Hero() {
         <div className="relative aspect-[4/5] w-full max-h-[720px] overflow-hidden img-radius md:aspect-auto md:h-[720px]">
           <Image
             src="/images/hero-margaret-memorial.webp"
-            alt="Memorial stone for Margaret Eleanor Campbell, 1941–2025, with a discreet LifeMarked marker"
+            alt="Memorial stone for Margaret Eleanor Campbell, 1941–2025, with a discreet Life Marked marker"
             fill
             priority
             className="object-cover object-[center_38%]"

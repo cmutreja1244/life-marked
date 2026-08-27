@@ -8,7 +8,7 @@ export function PhysicalProduct() {
           <div className="order-2 relative aspect-[16/10] w-full overflow-hidden img-radius md:order-1 md:aspect-auto md:h-[480px]">
             <Image
               src="/images/plaque-product.webp"
-              alt="LifeMarked brushed steel marker"
+              alt="Life Marked brushed steel marker"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 58vw"
@@ -20,7 +20,7 @@ export function PhysicalProduct() {
               Designed to belong.
             </h2>
             <p className="mt-4 text-lg text-warm-grey">
-              A LifeMarked marker should feel part of the memorial, not something added afterwards.
+              A Life Marked marker should feel part of the memorial, not something added afterwards.
             </p>
           </div>
         </div>

@@ -6,7 +6,7 @@ export function EmotionalStatement() {
           A name. Two dates. And an entire life in between.
         </h2>
         <p className="text-lg text-warm-grey">
-          A memorial tells us someone was here. LifeMarked helps preserve who they were.
+          A memorial tells us someone was here. Life Marked helps preserve who they were.
         </p>
       </div>
     </section>

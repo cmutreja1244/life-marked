@@ -20,7 +20,7 @@ export function MargaretStoryDemo() {
           <div className="order-2 relative aspect-[4/5] w-full overflow-hidden img-radius md:order-1 md:aspect-auto md:h-[560px]">
             <Image
               src="/images/margaret-memorial-close.webp"
-              alt="Margaret Eleanor Campbell's memorial with a discreet LifeMarked marker"
+              alt="Margaret Eleanor Campbell's memorial with a discreet Life Marked marker"
               fill
               className="object-cover object-center"
               sizes="(max-width: 768px) 100vw, 60vw"
