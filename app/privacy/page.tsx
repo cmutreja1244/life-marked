@@ -99,8 +99,18 @@ export default function PrivacyPage() {
               contact form submissions so we can respond to memorial businesses.
             </li>
             <li>
-              <strong className="font-medium text-charcoal">Analytics</strong> (Vercel Analytics)
-              to understand site usage in aggregate.
+              <strong className="font-medium text-charcoal">Database and authentication</strong>{" "}
+              (Supabase) for family accounts and memorial records.
+            </li>
+            <li>
+              <strong className="font-medium text-charcoal">Media storage</strong> (Supabase
+              Storage) for photos, audio, and video. Uploads are checked against an allowlist of
+              file types and known-bad signatures. Files are not sent to crowd-sourced malware
+              services.
+            </li>
+            <li>
+              <strong className="font-medium text-charcoal">Email</strong> (SendGrid) for sign-in
+              codes and family notices.
             </li>
           </ul>
           <p className="mt-5 text-warm-grey">

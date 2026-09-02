@@ -21,16 +21,18 @@ export type VoiceMemory = {
   title: string;
   recorded: string;
   duration: string;
-  image: string;
+  image: string | null;
   imageAlt: string;
   supportingText: string;
+  audioSrc?: string | null;
+  waveform?: number[] | null;
 };
 
 export type SignificantPlace = {
   heading: string;
   location: string;
   text: string;
-  image: string;
+  image: string | null;
   imageAlt: string;
   caption: string;
 };
@@ -42,8 +44,9 @@ export type Memorial = {
   birthYear: number;
   deathYear: number;
   years: string;
-  heroImage: string;
+  heroImage: string | null;
   heroImageAlt: string;
+  isDemo?: boolean;
   openingLine: string;
   intro: string;
   biography: string[];

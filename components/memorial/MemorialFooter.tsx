@@ -2,7 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { COMPANY } from "@/lib/company";
 
-export function MemorialFooter() {
+export function MemorialFooter({
+  isDemo = true,
+  publicToken,
+}: {
+  isDemo?: boolean;
+  publicToken?: string;
+}) {
   return (
     <footer className="bg-ivory">
       <div className="mx-auto max-w-[40rem] px-5 py-12 text-center md:px-10 md:py-16">
@@ -18,9 +24,18 @@ export function MemorialFooter() {
         <Link href="/" className="text-link mt-3 inline-block">
           lifemarked.co.uk
         </Link>
-        <p className="mt-8 text-sm text-warm-grey">
-          This is a fictional memorial created to demonstrate the LifeMarked experience.
-        </p>
+        <div className="mt-6 flex items-center justify-center gap-6 text-sm">
+          {publicToken ? (
+            <Link href={`/report/${publicToken}`} className="text-link">
+              Report a concern
+            </Link>
+          ) : null}
+        </div>
+        {isDemo ? (
+          <p className="mt-8 text-sm text-warm-grey">
+            This is a fictional memorial created to demonstrate the LifeMarked experience.
+          </p>
+        ) : null}
       </div>
     </footer>
   );

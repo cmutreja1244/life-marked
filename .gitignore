@@ -12,6 +12,9 @@
 
 # testing
 /coverage
+/test-results
+/playwright-report
+/blob-report
 
 # next.js
 /.next/
@@ -36,6 +39,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# supabase CLI
+supabase/.temp/
 
 # typescript
 *.tsbuildinfo

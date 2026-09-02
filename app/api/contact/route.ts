@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server";
+import { captureException } from "@/lib/monitoring";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { contactSchema } from "@/lib/validation";
 
 export async function POST(request: Request) {
+  const limited = await rateLimit("contact", clientIp(request), 8, 10 * 60 * 1000);
+  if (!limited.success) {
+    return NextResponse.json(
+      { error: "Please wait a moment before sending another enquiry." },
+      { status: 429 },
+    );
+  }
+
   let body: unknown;
 
   try {
@@ -45,7 +55,8 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    captureException(error, { route: "contact" });
     return NextResponse.json(
       { error: "Unable to submit your message. Please try again." },
       { status: 502 },

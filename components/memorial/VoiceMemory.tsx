@@ -16,34 +16,41 @@ export function VoiceMemory({ memorial }: { memorial: Memorial }) {
           </p>
           <h2 className="mt-3 font-serif text-[2rem] text-ivory md:text-[2.75rem]">{voice.title}</h2>
           <p className="mt-2 text-ivory/55">{voice.recorded}</p>
-          <div className="mt-6 border-t border-ivory/15 pt-5" aria-hidden>
-            <div className="flex h-8 items-end gap-[3px]">
-              {waveformHeights.map((height, index) => (
+          <div className="mt-6 border-t border-ivory/15 pt-5">
+            <div className="flex h-8 items-end gap-[3px]" aria-hidden>
+              {(voice.waveform ?? waveformHeights).slice(0, 18).map((height, index) => (
                 <div
                   key={index}
                   className="waveform-bar"
-                  style={{ height: `${height}px`, opacity: 0.55 }}
+                  style={{ height: `${typeof height === "number" ? Math.max(6, height % 34) : height}px`, opacity: 0.55 }}
                 />
               ))}
             </div>
             <p className="mt-2 text-sm text-ivory/45">{voice.duration}</p>
+            {voice.audioSrc ? (
+              <audio className="mt-4 w-full" controls preload="none" src={voice.audioSrc}>
+                Your browser cannot play this recording.
+              </audio>
+            ) : null}
           </div>
           <p className="mt-8 max-w-md text-[1.05rem] leading-relaxed text-ivory/65">
             {voice.supportingText}
           </p>
         </div>
 
-        <figure>
-          <div className="relative aspect-[4/5] overflow-hidden img-radius md:aspect-[3/4]">
-            <Image
-              src={voice.image}
-              alt={voice.imageAlt}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 40vw"
-            />
-          </div>
-        </figure>
+        {voice.image ? (
+          <figure>
+            <div className="relative aspect-[4/5] overflow-hidden img-radius md:aspect-[3/4]">
+              <Image
+                src={voice.image}
+                alt={voice.imageAlt}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 40vw"
+              />
+            </div>
+          </figure>
+        ) : null}
       </div>
     </section>
   );

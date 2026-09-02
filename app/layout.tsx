@@ -4,6 +4,7 @@ import { Instrument_Serif } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { COMPANY } from "@/lib/company";
+import { CANONICAL_ORIGIN } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,7 +18,7 @@ const instrumentSerif = Instrument_Serif({
   weight: "400",
 });
 
-const siteUrl = "https://lifemarked.alba-nova.com";
+const siteUrl = CANONICAL_ORIGIN;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

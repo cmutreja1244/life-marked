@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { COMPANY } from "@/lib/company";
 
 export function Footer() {
@@ -20,12 +21,15 @@ export function Footer() {
           </div>
 
           <nav aria-label="Footer" className="flex gap-8 text-sm text-ivory/55">
-            <a href="/privacy" className="hover:text-ivory">
+            <Link href="/privacy" className="hover:text-ivory">
               Privacy
-            </a>
-            <a href="/#contact" className="hover:text-ivory">
+            </Link>
+            <Link href="/terms" className="hover:text-ivory">
+              Terms
+            </Link>
+            <Link href="/#contact" className="hover:text-ivory">
               Contact
-            </a>
+            </Link>
           </nav>
         </div>
 

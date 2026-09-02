@@ -9,16 +9,20 @@ export function SignificantPlace({ memorial }: { memorial: Memorial }) {
     <section className="bg-ivory">
       <div className="mx-auto grid max-w-[76rem] items-center gap-8 px-5 py-12 md:grid-cols-2 md:gap-14 md:px-10 md:py-20">
         <figure>
-          <div className="relative aspect-[16/10] overflow-hidden img-radius">
-            <Image
-              src={place.image}
-              alt={place.imageAlt}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-          </div>
-          <figcaption className="mt-2 text-sm text-warm-grey">{place.caption}</figcaption>
+          {place.image ? (
+            <div className="relative aspect-[16/10] overflow-hidden img-radius">
+              <Image
+                src={place.image}
+                alt={place.imageAlt}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </div>
+          ) : null}
+          {place.caption ? (
+            <figcaption className="mt-2 text-sm text-warm-grey">{place.caption}</figcaption>
+          ) : null}
         </figure>
         <div>
           <h2 className="font-serif text-[2rem] text-charcoal md:text-[2.75rem]">{place.heading}</h2>

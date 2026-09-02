@@ -1,5 +1,7 @@
 export const MARGARET_HREF = "/m/margaret-campbell";
-export const SITE_URL = "https://www.lifemarked.co.uk";
+import { CANONICAL_ORIGIN } from "@/lib/site";
+
+export const SITE_URL = CANONICAL_ORIGIN;
 
 export function sanitisePartnerName(
   value: string | string[] | undefined,

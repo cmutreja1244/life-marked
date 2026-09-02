@@ -1,0 +1,4 @@
+-- Margaret seed is applied by the application store for local/dev.
+-- When auth.users exist, insert a published unlisted demo row with slug margaret-campbell
+-- and public_token MARGCAMP01. Do not reuse that token.
+-- Media files live in the memorials-originals (private) and memorials-public buckets.
