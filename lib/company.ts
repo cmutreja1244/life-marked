@@ -5,4 +5,5 @@ export const COMPANY = {
   vatNumber: "GB499900238",
   address: "3 Hill Street, Third Floor, New Town, Edinburgh, Scotland, EH2 3JP",
   registeredIn: "Scotland",
+  supportEmail: "support@lifemarked.co.uk",
 } as const;

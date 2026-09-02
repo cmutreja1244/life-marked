@@ -207,3 +207,67 @@ textarea.input-field {
   border-radius: 1px;
   opacity: 0.45;
 }
+
+.pilot-avoid-break {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+@media print {
+  .pilot-page {
+    background: #fff !important;
+    color: var(--charcoal);
+  }
+
+  .pilot-page .pilot-print-hide {
+    display: none !important;
+  }
+
+  .pilot-page .pilot-dark {
+    background: var(--ivory) !important;
+    color: var(--charcoal) !important;
+    border-top: 1px solid var(--stone);
+  }
+
+  .pilot-page .pilot-dark .section-label,
+  .pilot-page .pilot-dark p,
+  .pilot-page .pilot-dark li,
+  .pilot-page .pilot-dark h2,
+  .pilot-page .pilot-dark a {
+    color: var(--charcoal) !important;
+  }
+
+  .pilot-page .pilot-dark .text-ivory\/55,
+  .pilot-page .pilot-dark .text-ivory\/40,
+  .pilot-page .pilot-dark .text-ivory\/75,
+  .pilot-page .pilot-dark .text-ivory\/85 {
+    color: var(--warm-grey) !important;
+  }
+
+  .pilot-page a[href^="/"]::after {
+    content: " (https://www.lifemarked.co.uk" attr(href) ")";
+    font-size: 0.85em;
+    color: var(--warm-grey);
+  }
+
+  .pilot-page a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: var(--warm-grey);
+  }
+
+  .pilot-page a[href^="mailto:"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: var(--warm-grey);
+  }
+
+  .pilot-page a[href^="#"]::after {
+    content: none;
+  }
+
+  .pilot-page header,
+  .pilot-page nav {
+    position: static !important;
+  }
+}
