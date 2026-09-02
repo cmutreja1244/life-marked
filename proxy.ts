@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { CANONICAL_HOST, isWwwHost } from "@/lib/site";
 
 const FAMILY_PREFIXES = ["/home", "/memorials", "/preview", "/settings"];
 const ADMIN_PREFIXES = ["/admin"];
@@ -15,15 +14,6 @@ function isAdminPath(pathname: string) {
 }
 
 export function proxy(request: NextRequest) {
-  const host = request.headers.get("host");
-  if (isWwwHost(host)) {
-    const url = request.nextUrl.clone();
-    url.host = CANONICAL_HOST;
-    url.protocol = "https:";
-    url.port = "";
-    return NextResponse.redirect(url, 301);
-  }
-
   const { pathname } = request.nextUrl;
   const requestHeaders = new Headers(request.headers);
 
