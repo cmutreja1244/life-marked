@@ -26,7 +26,7 @@ export default async function HomePage() {
               <h2 className="mt-2 font-serif text-2xl">{memorial.fullName || "Untitled memorial"}</h2>
               <p className="mt-2 text-sm text-warm-grey">Updated {new Date(memorial.updatedAt).toLocaleString("en-GB")}</p>
               <div className="mt-5 flex gap-3">
-                <Link href={`/memorials/${memorial.id}/about`} className="btn-primary">
+                <Link href={`/memorials/${memorial.id}/overview`} className="btn-primary">
                   Continue
                 </Link>
                 <Link href={`/preview/${memorial.id}`} className="text-link self-center">

@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { memorialDeskPath } from "@/lib/admin/notices";
+import { sendFamilyInviteEmail } from "@/lib/email/invite";
+import { isMemorialLive } from "@/lib/platform/lifecycle";
+import { memorialDeskPath, type AdminMemorialNotice } from "@/lib/admin/notices";
 import { requireAdmin } from "@/lib/auth/session";
 import { store } from "@/lib/platform/store";
 
@@ -15,6 +17,27 @@ function revalidateMemorial(memorialId: string) {
   if (slug) revalidatePath(`/m/${slug}`);
 }
 
+function inviteNotice(status: "sent" | "skipped" | "failed"): AdminMemorialNotice {
+  if (status === "sent") return "invited";
+  if (status === "skipped") return "invited_link";
+  return "invite_failed";
+}
+
+async function deliverInvitation(memorialId: string, invitation: { id: string; email: string; kind: "owner" | "collaborator"; rawToken?: string; expiresAt: string }) {
+  const memorial = store.getMemorial(memorialId);
+  if (!invitation.rawToken || !memorial) return "failed" as const;
+  const result = await sendFamilyInviteEmail({
+    to: invitation.email,
+    memorialName: memorial.fullName,
+    firstName: memorial.firstName,
+    rawToken: invitation.rawToken,
+    expiresAt: invitation.expiresAt,
+    kind: invitation.kind,
+  });
+  if (result.status !== "failed") store.markInviteSent(invitation.id);
+  return result.status;
+}
+
 export async function adminCreateMemorial(formData: FormData) {
   const session = await requireAdmin();
   const created = store.createMemorial({
@@ -25,16 +48,61 @@ export async function adminCreateMemorial(formData: FormData) {
     publishingMode: formData.get("publishingMode") === "self_publish" ? "self_publish" : "admin_review",
   });
   const email = String(formData.get("ownerEmail") ?? "").trim();
-  if (email) await store.inviteOwner(created.id, email, session.user.id);
+  let notice: AdminMemorialNotice | undefined;
+  if (email) {
+    const invitation = await store.inviteOwner(created.id, email, session.user.id);
+    notice = inviteNotice(await deliverInvitation(created.id, invitation));
+  }
   revalidateMemorial(created.id);
-  redirect(memorialDeskPath(created.id, email ? "invited" : undefined));
+  redirect(memorialDeskPath(created.id, notice));
 }
 
 export async function adminInviteOwner(memorialId: string, formData: FormData) {
   const session = await requireAdmin();
-  await store.inviteOwner(memorialId, String(formData.get("email") ?? ""), session.user.id);
+  const invitation = await store.inviteOwner(memorialId, String(formData.get("email") ?? ""), session.user.id);
+  const notice = inviteNotice(await deliverInvitation(memorialId, invitation));
   revalidateMemorial(memorialId);
-  redirect(memorialDeskPath(memorialId, "invited"));
+  redirect(memorialDeskPath(memorialId, notice));
+}
+
+export async function adminRevokeInvite(memorialId: string, formData: FormData) {
+  await requireAdmin();
+  store.revokeInvitation(String(formData.get("inviteId") ?? ""));
+  revalidateMemorial(memorialId);
+  redirect(memorialDeskPath(memorialId, "invite_deleted"));
+}
+
+export async function adminResendInvite(memorialId: string, formData: FormData) {
+  const session = await requireAdmin();
+  const inviteId = String(formData.get("inviteId") ?? "");
+  const existing = store.invitations.find((row) => row.id === inviteId && row.memorialId === memorialId);
+  if (!existing) throw new Error("Invite not found.");
+  const expired = new Date(existing.expiresAt).getTime() < Date.now();
+  const invitation =
+    existing.revokedAt || expired || !existing.rawToken
+      ? await store.renewInvitation(inviteId, session.user.id)
+      : existing;
+  const notice = inviteNotice(await deliverInvitation(memorialId, invitation));
+  revalidateMemorial(memorialId);
+  redirect(memorialDeskPath(memorialId, notice === "invited" ? "invite_resent" : notice));
+}
+
+export async function adminTogglePublished(memorialId: string) {
+  const session = await requireAdmin();
+  const memorial = store.getMemorial(memorialId);
+  if (!memorial) throw new Error("Memorial not found.");
+  if (isMemorialLive(memorial)) {
+    store.disable(memorialId, "ops", session.user.id);
+  } else {
+    if (memorial.disabledAt || memorial.status === "disabled") {
+      store.enable(memorialId, session.user.id);
+    }
+    const current = store.getMemorial(memorialId);
+    if (!current?.publishedVersionId) {
+      store.publish(memorialId, session.user.id, "admin_publish");
+    }
+  }
+  revalidateMemorial(memorialId);
 }
 
 export async function adminPublish(memorialId: string) {

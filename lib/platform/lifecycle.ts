@@ -54,6 +54,14 @@ export function adminStatusLabel(status: MemorialStatus): string {
   }
 }
 
+export function isMemorialLive(memorial: {
+  status: MemorialStatus;
+  disabledAt: string | null;
+  publishedVersionId: string | null;
+}) {
+  return memorial.status === "published" && !memorial.disabledAt && Boolean(memorial.publishedVersionId);
+}
+
 export function versionReasonLabel(trigger: string): string {
   switch (trigger) {
     case "seed":

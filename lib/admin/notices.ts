@@ -1,5 +1,9 @@
 export const ADMIN_MEMORIAL_NOTICES = {
-  invited: "Invite created. Copy the link below and send it to the family — they use it to sign in and write the memorial.",
+  invited: "Invite emailed. They have 14 days to open the link and start writing.",
+  invited_link: "Invite created, but email could not be sent from this environment. Use Resend, or copy the link below.",
+  invite_failed: "Invite created, but the email did not send. Use Resend.",
+  invite_deleted: "That invite will no longer work.",
+  invite_resent: "Invite emailed again.",
   live: "This memorial is now live. Visitors and QR scans will see the version you just made live.",
   sent_back: "Sent back to the family so they can keep editing. The public page has not changed.",
   address: "New web address added. The previous address still works, so old links and markers are safe.",

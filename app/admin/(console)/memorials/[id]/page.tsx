@@ -7,6 +7,8 @@ import {
   adminInviteOwner,
   adminPublish,
   adminRequestChanges,
+  adminResendInvite,
+  adminRevokeInvite,
   adminRollback,
 } from "@/lib/admin/actions";
 import { noticeFromQuery } from "@/lib/admin/notices";
@@ -160,8 +162,8 @@ export default async function AdminMemorialDetail({
       <section className="rounded-lg border border-border-warm bg-ivory p-6">
         <h2 className="font-serif text-2xl">Invite the family</h2>
         <p className="mt-2 text-sm text-warm-grey">
-          This creates a private sign-in link, valid for 14 days. Copy it from the list below and send it to them. When they
-          open it, they can write the memorial. It does not change the live page.
+          We email them a private link. They open it, sign in, and can write the memorial. The live page does not change.
+          The link lasts 14 days.
         </p>
         <form action={adminInviteOwner.bind(null, id)} className="mt-5 flex flex-col gap-3 sm:flex-row">
           <label className="sr-only" htmlFor="owner-email">
@@ -176,18 +178,25 @@ export default async function AdminMemorialDetail({
             placeholder="family@example.com"
           />
           <button className="btn-primary shrink-0" type="submit">
-            Create invite
+            Send invite
           </button>
         </form>
         {invites.length ? (
           <ul className="mt-6 space-y-4">
             {invites.map((invite) => {
+              const expired = !invite.acceptedAt && !invite.revokedAt && new Date(invite.expiresAt).getTime() < Date.now();
               const state = invite.acceptedAt
                 ? `Accepted ${formatWhen(invite.acceptedAt)}`
                 : invite.revokedAt
-                  ? "Revoked"
-                  : `Waiting — expires ${formatWhen(invite.expiresAt)}`;
-              const href = invite.rawToken ? `${CANONICAL_ORIGIN}/invite/${invite.rawToken}` : null;
+                  ? "Deleted"
+                  : expired
+                    ? `Expired ${formatWhen(invite.expiresAt)}`
+                    : `Waiting — expires ${formatWhen(invite.expiresAt)}`;
+              const href = invite.rawToken && !invite.acceptedAt && !invite.revokedAt && !expired
+                ? `${CANONICAL_ORIGIN}/invite/${invite.rawToken}`
+                : null;
+              const canResend = !invite.acceptedAt;
+              const canDelete = !invite.acceptedAt && !invite.revokedAt;
               return (
                 <li key={invite.id} className="rounded-md border border-border-warm p-4">
                   <p>
@@ -197,12 +206,36 @@ export default async function AdminMemorialDetail({
                     </span>
                   </p>
                   <p className="mt-1 text-sm text-warm-grey">{state}</p>
-                  {href && !invite.acceptedAt && !invite.revokedAt ? (
+                  {invite.sentAt ? (
+                    <p className="mt-1 text-sm text-warm-grey">Last emailed {formatWhen(invite.sentAt)}</p>
+                  ) : null}
+                  {href ? (
                     <label className="mt-3 block text-sm text-warm-grey">
-                      Sign-in link to send them
+                      Link in the email
                       <input readOnly className="input-field mt-2 font-mono text-sm" value={href} />
                     </label>
                   ) : null}
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    {canResend ? (
+                      <form action={adminResendInvite.bind(null, id)}>
+                        <input type="hidden" name="inviteId" value={invite.id} />
+                        <button className="btn-secondary" type="submit">
+                          {expired || invite.revokedAt ? "Send a new invite" : "Resend email"}
+                        </button>
+                      </form>
+                    ) : null}
+                    {canDelete ? (
+                      <form action={adminRevokeInvite.bind(null, id)}>
+                        <input type="hidden" name="inviteId" value={invite.id} />
+                        <ConfirmSubmit
+                          className="btn-secondary"
+                          message="This invite link will stop working. Continue?"
+                        >
+                          Delete invite
+                        </ConfirmSubmit>
+                      </form>
+                    ) : null}
+                  </div>
                 </li>
               );
             })}

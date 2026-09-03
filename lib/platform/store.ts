@@ -323,6 +323,7 @@ class PlatformRepository {
       expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
       acceptedAt: null,
       revokedAt: null,
+      sentAt: null,
     };
     this.invitations.push(invitation);
     memorial.status = "owner_invited";
@@ -349,6 +350,7 @@ class PlatformRepository {
       expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
       acceptedAt: null,
       revokedAt: null,
+      sentAt: null,
     };
     this.invitations.push(invitation);
     this.recordAudit(actorId, memorialId, "invite.collaborator", { email, role });
@@ -378,6 +380,36 @@ class PlatformRepository {
       memorial.updatedAt = nowIso();
     }
     return invitation.memorialId;
+  }
+
+  markInviteSent(invitationId: string) {
+    const invitation = this.invitations.find((row) => row.id === invitationId);
+    if (!invitation) throw new Error("Invite not found.");
+    invitation.sentAt = nowIso();
+    return invitation;
+  }
+
+  revokeInvitation(invitationId: string) {
+    const invitation = this.invitations.find((row) => row.id === invitationId);
+    if (!invitation) throw new Error("Invite not found.");
+    if (invitation.acceptedAt) throw new Error("This invite has already been used.");
+    invitation.revokedAt = nowIso();
+    invitation.rawToken = undefined;
+    this.recordAudit(null, invitation.memorialId, "invite.revoked", { invitationId });
+    return invitation;
+  }
+
+  async renewInvitation(invitationId: string, actorId: string | null) {
+    const invitation = this.invitations.find((row) => row.id === invitationId);
+    if (!invitation) throw new Error("Invite not found.");
+    if (invitation.acceptedAt) throw new Error("This invite has already been used.");
+    const rawToken = generateInviteToken();
+    invitation.tokenHash = await sha256(rawToken);
+    invitation.rawToken = rawToken;
+    invitation.revokedAt = null;
+    invitation.expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+    this.recordAudit(actorId, invitation.memorialId, "invite.renewed", { invitationId });
+    return { ...invitation, rawToken };
   }
 
   upsertProfile(profile: Profile) {

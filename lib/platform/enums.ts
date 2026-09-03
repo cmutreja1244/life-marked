@@ -48,3 +48,16 @@ export const SECTION_KEYS = [
   "close",
 ] as const;
 export type SectionKey = (typeof SECTION_KEYS)[number];
+
+export const SECTION_LABELS: Record<SectionKey, string> = {
+  hero: "Opening",
+  story: "Their story",
+  timeline: "Life moments",
+  gallery: "Photographs",
+  favourites: "Favourites",
+  memories: "Memories",
+  voice: "Voice",
+  video: "Video",
+  places: "Places",
+  close: "Closing words",
+};

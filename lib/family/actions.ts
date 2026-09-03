@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireFamily, requireMemorialAccess } from "@/lib/auth/session";
+import { sendFamilyInviteEmail } from "@/lib/email/invite";
 import { store } from "@/lib/platform/store";
 import { sanitiseTiptap, type TipTapNode } from "@/lib/platform/tiptap";
 import type { SectionKey } from "@/lib/platform/enums";
@@ -40,49 +41,83 @@ export async function saveStory(memorialId: string, document: TipTapNode, pullQu
 export async function saveTimeline(memorialId: string, formData: FormData) {
   await requireMemorialAccess(memorialId, "edit");
   const raw = String(formData.get("timeline") ?? "[]");
-  const timeline = JSON.parse(raw) as Array<{ year: string; title: string; detail: string }>;
+  const parsed = JSON.parse(raw) as Array<{ year: string; title: string; detail: string }>;
+  const timeline = parsed.filter((item) => item.year.trim() || item.title.trim() || item.detail.trim());
   store.updateContent(memorialId, { timeline });
   await touch(memorialId);
 }
 
 export async function saveFavourites(memorialId: string, formData: FormData) {
   await requireMemorialAccess(memorialId, "edit");
-  const favouriteThings = String(formData.get("favourites") ?? "")
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const raw = String(formData.get("favourites") ?? "");
+  let favouriteThings: string[] = [];
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (Array.isArray(parsed)) favouriteThings = parsed.map((item) => String(item).trim()).filter(Boolean);
+    else throw new Error("not json array");
+  } catch {
+    favouriteThings = raw
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+  }
   store.updateContent(memorialId, { favouriteThings });
   await touch(memorialId);
 }
 
 export async function saveMemories(memorialId: string, formData: FormData) {
   await requireMemorialAccess(memorialId, "edit");
-  const memories = String(formData.get("memories") ?? "")
-    .split("\n\n")
-    .map((block) => block.trim())
-    .filter(Boolean)
-    .map((block) => {
-      const [quote, author] = block.split("\n—").map((part) => part.trim());
-      return { quote: quote ?? "", author: author ?? "", status: "approved" as const };
-    });
+  const raw = String(formData.get("memories") ?? "");
+  let memories: Array<{ quote: string; author: string; status: "approved" }>;
+  try {
+    const parsed = JSON.parse(raw) as Array<{ quote?: string; author?: string }>;
+    memories = parsed
+      .map((item) => ({ quote: String(item.quote ?? "").trim(), author: String(item.author ?? "").trim(), status: "approved" as const }))
+      .filter((item) => item.quote || item.author);
+  } catch {
+    memories = raw
+      .split("\n\n")
+      .map((block) => block.trim())
+      .filter(Boolean)
+      .map((block) => {
+        const [quote, author] = block.split("\n—").map((part) => part.trim());
+        return { quote: quote ?? "", author: author ?? "", status: "approved" as const };
+      });
+  }
   store.updateContent(memorialId, { memories });
   await touch(memorialId);
 }
 
 export async function savePlaces(memorialId: string, formData: FormData) {
   await requireMemorialAccess(memorialId, "edit");
-  store.updateContent(memorialId, {
-    places: [
+  const heroAssetId = store.getMemorial(memorialId)?.heroAssetId ?? null;
+  const raw = String(formData.get("places") ?? "");
+  let places: Array<{ heading: string; location: string; text: string; caption: string; assetId: string | null; imageAlt: string }>;
+  try {
+    const parsed = JSON.parse(raw) as Array<{ heading?: string; location?: string; text?: string; caption?: string }>;
+    places = parsed
+      .map((place) => ({
+        heading: String(place.heading ?? "A place they loved"),
+        location: String(place.location ?? ""),
+        text: String(place.text ?? ""),
+        caption: String(place.caption ?? ""),
+        assetId: heroAssetId,
+        imageAlt: "",
+      }))
+      .filter((place) => place.location || place.text);
+  } catch {
+    places = [
       {
         heading: String(formData.get("heading") ?? "A place they loved"),
         location: String(formData.get("location") ?? ""),
         text: String(formData.get("text") ?? ""),
-        assetId: store.getMemorial(memorialId)?.heroAssetId ?? null,
+        assetId: heroAssetId,
         imageAlt: String(formData.get("imageAlt") ?? ""),
         caption: String(formData.get("caption") ?? ""),
       },
-    ].filter((place) => place.location || place.text),
-  });
+    ].filter((place) => place.location || place.text);
+  }
+  store.updateContent(memorialId, { places });
   await touch(memorialId);
 }
 
@@ -150,12 +185,24 @@ export async function selfPublish(memorialId: string) {
 
 export async function inviteCollaboratorAction(memorialId: string, formData: FormData) {
   const { session } = await requireMemorialAccess(memorialId, "manage");
-  await store.inviteCollaborator(
+  const invitation = await store.inviteCollaborator(
     memorialId,
     String(formData.get("email") ?? ""),
     String(formData.get("role") ?? "editor") === "viewer" ? "viewer" : "editor",
     session.user.id,
   );
+  const memorial = store.getMemorial(memorialId);
+  if (invitation.rawToken && memorial) {
+    const result = await sendFamilyInviteEmail({
+      to: invitation.email,
+      memorialName: memorial.fullName,
+      firstName: memorial.firstName,
+      rawToken: invitation.rawToken,
+      expiresAt: invitation.expiresAt,
+      kind: "collaborator",
+    });
+    if (result.status !== "failed") store.markInviteSent(invitation.id);
+  }
   await touch(memorialId);
 }
 

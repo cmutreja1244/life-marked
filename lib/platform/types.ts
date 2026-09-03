@@ -103,6 +103,7 @@ export type Invitation = {
   expiresAt: string;
   acceptedAt: string | null;
   revokedAt: string | null;
+  sentAt: string | null;
 };
 
 export type ContributionLinkRecord = {

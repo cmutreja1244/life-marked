@@ -24,7 +24,7 @@ export default function NewMemorialPage() {
           Family email (optional)
           <input name="ownerEmail" type="email" className="input-field mt-2" />
           <span className="mt-2 block text-warm-grey">
-            If you add an email, we create a sign-in link you can copy and send them. You can also invite them later.
+            If you add an email, we send them an invite to write the memorial. You can also invite them later.
           </span>
         </label>
         <label className="block text-sm">
