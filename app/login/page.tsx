@@ -1,4 +1,6 @@
 import { sendFamilyOtp, verifyFamilyOtp } from "@/lib/auth/actions";
+import { BrandMark } from "@/components/brand/BrandMark";
+import { PendingSubmit } from "@/components/ui/PendingSubmit";
 
 export default async function LoginPage({
   searchParams,
@@ -10,9 +12,10 @@ export default async function LoginPage({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-5">
-      <h1 className="font-serif text-4xl">Sign in</h1>
+      <BrandMark href="/" />
+      <h1 className="mt-10 font-serif text-4xl">Sign in</h1>
       <p className="mt-3 text-warm-grey">
-        {email ? "Enter the 6-digit code we sent." : "We will send a 6-digit code to your email."}
+        {email ? "Enter the 6-digit code we emailed you." : "We will email you a 6-digit code."}
       </p>
       {email ? (
         <form action={verifyFamilyOtp} className="mt-8 space-y-4">
@@ -20,11 +23,11 @@ export default async function LoginPage({
           <input type="hidden" name="next" value={destination} />
           <label className="block text-sm">
             Code
-            <input name="code" inputMode="numeric" required minLength={6} maxLength={6} className="input-field mt-2" />
+            <input name="code" inputMode="numeric" required minLength={6} maxLength={8} className="input-field mt-2" autoComplete="one-time-code" />
           </label>
-          <button className="btn-primary w-full" type="submit">
+          <PendingSubmit className="btn-primary w-full" pendingLabel="Checking...">
             Continue
-          </button>
+          </PendingSubmit>
         </form>
       ) : (
         <form action={sendFamilyOtp} className="mt-8 space-y-4">
@@ -33,9 +36,7 @@ export default async function LoginPage({
             <input name="email" type="email" required className="input-field mt-2" />
           </label>
           <input type="hidden" name="next" value={destination} />
-          <button className="btn-primary w-full" type="submit">
-            Send code
-          </button>
+          <PendingSubmit className="btn-primary w-full">Send code</PendingSubmit>
         </form>
       )}
     </main>

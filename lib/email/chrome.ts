@@ -12,8 +12,9 @@ export function transactionalEmailHtml(input: {
   recipientEmail: string;
   headline: string;
   paragraphs: string[];
-  ctaLabel: string;
-  ctaHref: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  code?: string;
   expiryNote: string;
 }) {
   const paragraphs = input.paragraphs
@@ -22,9 +23,25 @@ export function transactionalEmailHtml(input: {
         `<p style="margin:16px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#6e6a63;">${escapeHtml(paragraph)}</p>`,
     )
     .join("");
-  const href = escapeHtml(input.ctaHref);
   const headline = escapeHtml(input.headline);
   const logo = escapeHtml(EMAIL_LOGO_SRC);
+  const codeBlock = input.code
+    ? `<p style="margin:28px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:36px;letter-spacing:0.28em;font-weight:500;color:#242422;">${escapeHtml(input.code)}</p>`
+    : "";
+  const ctaBlock =
+    input.ctaHref && input.ctaLabel
+      ? `<p style="margin:28px 0 0;">
+                  <a href="${escapeHtml(input.ctaHref)}" style="display:inline-block;background:#242422;color:#f4f0e8;text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-size:15px;letter-spacing:0.02em;padding:14px 24px;border-radius:6px;">
+                    ${escapeHtml(input.ctaLabel)}
+                  </a>
+                </p>
+                <p style="margin:28px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#6e6a63;">
+                  ${escapeHtml(input.expiryNote)} If the button does not work, paste this address into your browser:
+                </p>
+                <p style="margin:8px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;word-break:break-all;color:#242422;">
+                  ${escapeHtml(input.ctaHref)}
+                </p>`
+      : `<p style="margin:28px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#6e6a63;">${escapeHtml(input.expiryNote)}</p>`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -42,17 +59,8 @@ export function transactionalEmailHtml(input: {
               <td style="background:#ffffff;border:1px solid rgba(110,106,99,0.22);border-radius:8px;padding:36px 32px;">
                 <h1 style="margin:0;font-size:32px;line-height:1.2;font-weight:400;">${headline}</h1>
                 ${paragraphs}
-                <p style="margin:28px 0 0;">
-                  <a href="${href}" style="display:inline-block;background:#242422;color:#f4f0e8;text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-size:15px;letter-spacing:0.02em;padding:14px 24px;border-radius:6px;">
-                    ${escapeHtml(input.ctaLabel)}
-                  </a>
-                </p>
-                <p style="margin:28px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#6e6a63;">
-                  ${escapeHtml(input.expiryNote)} If the button does not work, paste this address into your browser:
-                </p>
-                <p style="margin:8px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;word-break:break-all;color:#242422;">
-                  ${href}
-                </p>
+                ${codeBlock}
+                ${ctaBlock}
               </td>
             </tr>
             <tr>

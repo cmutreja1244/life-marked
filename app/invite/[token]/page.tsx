@@ -1,4 +1,5 @@
 import { acceptInviteAction } from "@/lib/family/actions";
+import { BrandMark } from "@/components/brand/BrandMark";
 import { getSession } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 
@@ -11,7 +12,8 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-5">
-      <h1 className="font-serif text-4xl">Join this memorial</h1>
+      <BrandMark href="/" />
+      <h1 className="mt-10 font-serif text-4xl">Join this memorial</h1>
       <p className="mt-3 text-warm-grey">You are signed in as {session.user.email}.</p>
       <form
         className="mt-8"

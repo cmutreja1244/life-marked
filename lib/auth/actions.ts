@@ -1,8 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { issueConfirmedEmailOtp } from "@/lib/auth/admin";
 import { createSupabaseServerClient, getSession, setSession, clearSession } from "@/lib/auth/session";
 import { verifyTotp } from "@/lib/auth/totp";
+import { sendSignInCodeEmail } from "@/lib/email/invite";
 import { hasSupabase } from "@/lib/env";
 import { store } from "@/lib/platform/store";
 import type { Profile } from "@/lib/platform/types";
@@ -33,19 +35,19 @@ export async function sendFamilyOtp(formData: FormData) {
   if (!limited.success) throw new Error("Please wait a moment before requesting another code.");
 
   const next = String(formData.get("next") ?? "/home");
+  let code: string;
   if (hasSupabase()) {
-    const supabase = await createSupabaseServerClient();
-    const { error } = await supabase!.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: true },
-    });
-    if (error) throw new Error(error.message);
-    redirect(`/login?email=${encodeURIComponent(email)}&next=${encodeURIComponent(next)}`);
+    code = await issueConfirmedEmailOtp(email);
+  } else {
+    code = String(Math.floor(100000 + Math.random() * 900000));
+    store.setOtp(email, code);
   }
 
-  const code = String(Math.floor(100000 + Math.random() * 900000));
-  store.setOtp(email, code);
-  if (process.env.NODE_ENV !== "production") {
+  const emailed = await sendSignInCodeEmail(email, code);
+  if (emailed.status === "failed") {
+    throw new Error("We could not send the sign-in code. Please try again.");
+  }
+  if (emailed.status === "skipped" && process.env.NODE_ENV !== "production") {
     console.info(`[dev otp] ${email} ${code}`);
   }
   redirect(`/login?email=${encodeURIComponent(email)}&next=${encodeURIComponent(next)}`);
@@ -58,8 +60,11 @@ export async function verifyFamilyOtp(formData: FormData) {
 
   if (hasSupabase()) {
     const supabase = await createSupabaseServerClient();
-    const { error } = await supabase!.auth.verifyOtp({ email, token: code, type: "email" });
-    if (error) throw new Error("That code did not match. Please try again.");
+    const first = await supabase!.auth.verifyOtp({ email, token: code, type: "email" });
+    const result = first.error
+      ? await supabase!.auth.verifyOtp({ email, token: code, type: "magiclink" })
+      : first;
+    if (result.error) throw new Error("That code did not match. Please try again.");
     redirect(next.startsWith("/") ? next : "/home");
   }
 

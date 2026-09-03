@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { BrandMark } from "@/components/brand/BrandMark";
 import { getSession } from "@/lib/auth/session";
 import { signOut } from "@/lib/auth/actions";
 
@@ -11,9 +12,7 @@ export default async function FamilyLayout({ children }: { children: React.React
     <div className="min-h-screen bg-ivory text-charcoal">
       <header className="border-b border-border-warm">
         <div className="mx-auto flex h-14 max-w-[76rem] items-center justify-between px-5 md:px-10">
-          <Link href="/home" className="font-serif text-xl">
-            LifeMarked
-          </Link>
+          <BrandMark href="/home" />
           <div className="flex items-center gap-4 text-sm">
             <span className="hidden text-warm-grey sm:inline">{session.user.email}</span>
             {session.user.isAdmin ? (

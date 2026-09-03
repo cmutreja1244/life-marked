@@ -122,3 +122,25 @@ export async function sendMemoryRequestEmail(input: {
     return { status: "failed" } as const;
   }
 }
+
+export function signInCodeEmailHtml(input: { recipientEmail: string; code: string }) {
+  return transactionalEmailHtml({
+    recipientEmail: input.recipientEmail,
+    headline: "Your sign-in code",
+    paragraphs: [
+      "Enter this 6-digit code on the LifeMarked sign-in page. We will never ask you for it by phone or in another email.",
+    ],
+    code: input.code,
+    expiryNote: "This code expires in one hour.",
+  });
+}
+
+export async function sendSignInCodeEmail(to: string, code: string) {
+  const html = signInCodeEmailHtml({ recipientEmail: to, code });
+  try {
+    const result = await sendTransactionalEmail(to, "Your LifeMarked sign-in code", html);
+    return result.skipped ? ({ status: "skipped" } as const) : ({ status: "sent" } as const);
+  } catch {
+    return { status: "failed" } as const;
+  }
+}
