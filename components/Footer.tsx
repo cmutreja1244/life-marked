@@ -20,7 +20,10 @@ export function Footer() {
             <p className="mt-2 text-sm text-ivory/45">VAT {COMPANY.vatNumber}</p>
           </div>
 
-          <nav aria-label="Footer" className="flex gap-8 text-sm text-ivory/55">
+          <nav aria-label="Footer" className="flex flex-wrap gap-8 text-sm text-ivory/55">
+            <Link href="/home" className="hover:text-ivory">
+              Your memorial
+            </Link>
             <Link href="/privacy" className="hover:text-ivory">
               Privacy
             </Link>

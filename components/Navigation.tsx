@@ -59,6 +59,12 @@ export function Navigation() {
               {link.label}
             </a>
           ))}
+          <a
+            href="/home"
+            className="text-[0.8125rem] text-warm-grey transition-colors hover:text-charcoal"
+          >
+            Your memorial
+          </a>
           <a href="#contact" className="btn-primary text-sm" onClick={handlePartnerClick}>
             Become a partner
           </a>
@@ -86,6 +92,11 @@ export function Navigation() {
                 </a>
               </li>
             ))}
+            <li>
+              <a href="/home" className="block text-charcoal" onClick={() => setMenuOpen(false)}>
+                Your memorial
+              </a>
+            </li>
             <li>
               <a href="#contact" className="btn-primary mt-2 w-full" onClick={handlePartnerClick}>
                 Become a partner
