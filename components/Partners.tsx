@@ -88,6 +88,11 @@ export function Partners() {
           >
             Become a partner
           </a>
+          <p className="mt-4">
+            <a href="/partners/pilot" className="text-sm text-ivory/70 underline decoration-ivory/30 underline-offset-[0.28em] hover:text-ivory">
+              How the partnership works
+            </a>
+          </p>
         </div>
       </div>
     </section>

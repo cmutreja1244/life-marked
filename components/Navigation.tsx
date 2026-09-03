@@ -60,10 +60,10 @@ export function Navigation() {
             </a>
           ))}
           <a
-            href="/home"
+            href="/login"
             className="text-[0.8125rem] text-warm-grey transition-colors hover:text-charcoal"
           >
-            Your memorial
+            Sign in
           </a>
           <a href="#contact" className="btn-primary text-sm" onClick={handlePartnerClick}>
             Become a partner
@@ -93,8 +93,8 @@ export function Navigation() {
               </li>
             ))}
             <li>
-              <a href="/home" className="block text-charcoal" onClick={() => setMenuOpen(false)}>
-                Your memorial
+              <a href="/login" className="block text-charcoal" onClick={() => setMenuOpen(false)}>
+                Sign in
               </a>
             </li>
             <li>

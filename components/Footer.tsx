@@ -17,12 +17,11 @@ export function Footer() {
             />
             <p className="mt-3 text-sm text-ivory/50">Every life leaves more than a name.</p>
             <p className="mt-6 text-sm leading-relaxed text-ivory/45">{COMPANY.address}</p>
-            <p className="mt-2 text-sm text-ivory/45">VAT {COMPANY.vatNumber}</p>
           </div>
 
           <nav aria-label="Footer" className="flex flex-wrap gap-8 text-sm text-ivory/55">
-            <Link href="/home" className="hover:text-ivory">
-              Your memorial
+            <Link href="/login" className="hover:text-ivory">
+              Sign in
             </Link>
             <Link href="/privacy" className="hover:text-ivory">
               Privacy
