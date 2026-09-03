@@ -119,7 +119,11 @@ export async function createSupabaseServerClient() {
         return jar.getAll();
       },
       setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => jar.set(name, value, options));
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => jar.set(name, value, options));
+        } catch {
+          // Server Components cannot write cookies. proxy.ts refreshes the session instead.
+        }
       },
     },
   });
