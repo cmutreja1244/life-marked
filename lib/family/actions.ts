@@ -1,8 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireFamily, requireMemorialAccess } from "@/lib/auth/session";
-import { sendFamilyInviteEmail } from "@/lib/email/invite";
+import { sendFamilyInviteEmail, sendMemoryRequestEmail } from "@/lib/email/invite";
+import {
+  editorMemoriesPath,
+  editorOverviewPath,
+  inviteNoticeFromStatus,
+  type FamilyEditorNotice,
+} from "@/lib/family/notices";
 import { store } from "@/lib/platform/store";
 import { sanitiseTiptap, type TipTapNode } from "@/lib/platform/tiptap";
 import type { SectionKey } from "@/lib/platform/enums";
@@ -183,6 +190,28 @@ export async function selfPublish(memorialId: string) {
   await touch(memorialId);
 }
 
+async function deliverCollaboratorInvite(memorialId: string, invitation: {
+  id: string;
+  email: string;
+  collaboratorRole: "editor" | "viewer" | "owner" | null;
+  rawToken?: string;
+  expiresAt: string;
+}): Promise<FamilyEditorNotice> {
+  const memorial = store.getMemorial(memorialId);
+  if (!invitation.rawToken || !memorial) return "invite_failed";
+  const result = await sendFamilyInviteEmail({
+    to: invitation.email,
+    memorialName: memorial.fullName,
+    firstName: memorial.firstName,
+    rawToken: invitation.rawToken,
+    expiresAt: invitation.expiresAt,
+    kind: "collaborator",
+    collaboratorRole: invitation.collaboratorRole,
+  });
+  if (result.status !== "failed") store.markInviteSent(invitation.id);
+  return inviteNoticeFromStatus(result.status);
+}
+
 export async function inviteCollaboratorAction(memorialId: string, formData: FormData) {
   const { session } = await requireMemorialAccess(memorialId, "manage");
   const invitation = await store.inviteCollaborator(
@@ -191,32 +220,82 @@ export async function inviteCollaboratorAction(memorialId: string, formData: For
     String(formData.get("role") ?? "editor") === "viewer" ? "viewer" : "editor",
     session.user.id,
   );
-  const memorial = store.getMemorial(memorialId);
-  if (invitation.rawToken && memorial) {
-    const result = await sendFamilyInviteEmail({
-      to: invitation.email,
-      memorialName: memorial.fullName,
-      firstName: memorial.firstName,
-      rawToken: invitation.rawToken,
-      expiresAt: invitation.expiresAt,
-      kind: "collaborator",
-    });
-    if (result.status !== "failed") store.markInviteSent(invitation.id);
-  }
+  const notice = await deliverCollaboratorInvite(memorialId, invitation);
   await touch(memorialId);
+  redirect(editorOverviewPath(memorialId, notice));
 }
 
-export async function createContributionLinkAction(memorialId: string, formData: FormData) {
+export async function resendCollaboratorInviteAction(memorialId: string, formData: FormData) {
   const { session } = await requireMemorialAccess(memorialId, "manage");
-  const kinds = String(formData.get("kinds") ?? "memory").split(",") as Array<"memory" | "photo" | "audio" | "video">;
-  await store.createContributionLink(memorialId, {
-    allowedKinds: kinds,
-    maxSubmissions: Number(formData.get("max") ?? 20),
-    expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    reusable: true,
-  });
-  store.recordAudit(session.user.id, memorialId, "contribution_link.created", {});
+  const inviteId = String(formData.get("inviteId") ?? "");
+  const existing = store.invitations.find((row) => row.id === inviteId && row.memorialId === memorialId);
+  if (!existing) throw new Error("Invite not found.");
+  const expired = new Date(existing.expiresAt).getTime() < Date.now();
+  const invitation =
+    existing.revokedAt || expired || !existing.rawToken
+      ? await store.renewInvitation(inviteId, session.user.id)
+      : existing;
+  const notice = await deliverCollaboratorInvite(memorialId, invitation);
   await touch(memorialId);
+  redirect(editorOverviewPath(memorialId, notice === "invited" ? "invite_resent" : notice));
+}
+
+export async function revokeCollaboratorInviteAction(memorialId: string, formData: FormData) {
+  await requireMemorialAccess(memorialId, "manage");
+  store.revokeInvitation(String(formData.get("inviteId") ?? ""));
+  await touch(memorialId);
+  redirect(editorOverviewPath(memorialId, "invite_deleted"));
+}
+
+export async function ensureMemoryLinkAction(memorialId: string) {
+  const { session } = await requireMemorialAccess(memorialId, "manage");
+  await store.getOrCreateMemoryLink(memorialId, session.user.id);
+  await touch(memorialId);
+  redirect(editorOverviewPath(memorialId, "memory_link"));
+}
+
+export async function sendMemoryRequestEmailAction(memorialId: string, formData: FormData) {
+  const { session } = await requireMemorialAccess(memorialId, "manage");
+  const to = String(formData.get("email") ?? "").trim();
+  const memorial = store.getMemorial(memorialId);
+  const link = await store.getOrCreateMemoryLink(memorialId, session.user.id);
+  if (!to || !memorial || !link.rawToken) {
+    await touch(memorialId);
+    redirect(editorOverviewPath(memorialId, "memory_failed"));
+  }
+  const result = await sendMemoryRequestEmail({
+    to,
+    memorialName: memorial.fullName,
+    rawToken: link.rawToken,
+    expiresAt: link.expiresAt,
+  });
+  await touch(memorialId);
+  redirect(
+    editorOverviewPath(
+      memorialId,
+      result.status === "sent" ? "memory_sent" : result.status === "skipped" ? "memory_skipped" : "memory_failed",
+    ),
+  );
+}
+
+export async function approveContributionAction(memorialId: string, formData: FormData) {
+  await requireMemorialAccess(memorialId, "edit");
+  const id = String(formData.get("contributionId") ?? "");
+  const row = store.contributions.find((item) => item.id === id && item.memorialId === memorialId);
+  if (!row) throw new Error("Memory not found.");
+  store.approveContribution(id);
+  await touch(memorialId);
+  redirect(editorMemoriesPath(memorialId, "approved"));
+}
+
+export async function declineContributionAction(memorialId: string, formData: FormData) {
+  await requireMemorialAccess(memorialId, "edit");
+  const id = String(formData.get("contributionId") ?? "");
+  const row = store.contributions.find((item) => item.id === id && item.memorialId === memorialId);
+  if (!row) throw new Error("Memory not found.");
+  store.rejectContribution(id);
+  await touch(memorialId);
+  redirect(editorMemoriesPath(memorialId, "declined"));
 }
 
 export async function requestExport(memorialId: string) {
@@ -228,6 +307,14 @@ export async function scheduleMemorialDelete(memorialId: string) {
   const { session } = await requireMemorialAccess(memorialId, "manage");
   store.scheduleDelete(memorialId, session.user.id);
   revalidatePath("/home");
+  redirect(editorOverviewPath(memorialId, "closed"));
+}
+
+export async function cancelMemorialDelete(memorialId: string) {
+  const { session } = await requireMemorialAccess(memorialId, "manage");
+  store.restoreMemorial(memorialId, session.user.id);
+  revalidatePath("/home");
+  redirect(editorOverviewPath(memorialId, "reopened"));
 }
 
 export type { SectionKey };

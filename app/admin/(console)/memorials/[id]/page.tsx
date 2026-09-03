@@ -13,9 +13,11 @@ import {
 } from "@/lib/admin/actions";
 import { noticeFromQuery } from "@/lib/admin/notices";
 import { ConfirmSubmit } from "@/components/admin/ConfirmSubmit";
+import { PendingSubmit } from "@/components/ui/PendingSubmit";
+import { inviteUrl } from "@/lib/email/invite";
 import { adminStatusLabel, versionReasonLabel } from "@/lib/platform/lifecycle";
 import { store } from "@/lib/platform/store";
-import { CANONICAL_ORIGIN, memorialUrl, qrUrl } from "@/lib/site";
+import { memorialUrl, qrUrl } from "@/lib/site";
 import { notFound } from "next/navigation";
 
 function formatWhen(iso: string) {
@@ -177,9 +179,7 @@ export default async function AdminMemorialDetail({
             className="input-field"
             placeholder="family@example.com"
           />
-          <button className="btn-primary shrink-0" type="submit">
-            Send invite
-          </button>
+          <PendingSubmit>Send invite</PendingSubmit>
         </form>
         {invites.length ? (
           <ul className="mt-6 space-y-4">
@@ -193,7 +193,7 @@ export default async function AdminMemorialDetail({
                     ? `Expired ${formatWhen(invite.expiresAt)}`
                     : `Waiting — expires ${formatWhen(invite.expiresAt)}`;
               const href = invite.rawToken && !invite.acceptedAt && !invite.revokedAt && !expired
-                ? `${CANONICAL_ORIGIN}/invite/${invite.rawToken}`
+                ? inviteUrl(invite.rawToken)
                 : null;
               const canResend = !invite.acceptedAt;
               const canDelete = !invite.acceptedAt && !invite.revokedAt;
@@ -219,9 +219,9 @@ export default async function AdminMemorialDetail({
                     {canResend ? (
                       <form action={adminResendInvite.bind(null, id)}>
                         <input type="hidden" name="inviteId" value={invite.id} />
-                        <button className="btn-secondary" type="submit">
+                        <PendingSubmit className="btn-secondary">
                           {expired || invite.revokedAt ? "Send a new invite" : "Resend email"}
-                        </button>
+                        </PendingSubmit>
                       </form>
                     ) : null}
                     {canDelete ? (
@@ -307,9 +307,9 @@ export default async function AdminMemorialDetail({
                 placeholder="What still needs doing"
               />
             </label>
-            <button className="btn-secondary" type="submit">
+            <PendingSubmit className="btn-secondary" pendingLabel="Working...">
               Send back to the family
-            </button>
+            </PendingSubmit>
           </form>
         </div>
       </section>

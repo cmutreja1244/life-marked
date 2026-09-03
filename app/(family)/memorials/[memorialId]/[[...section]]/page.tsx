@@ -1,8 +1,13 @@
 import { notFound, redirect } from "next/navigation";
 import {
-  createContributionLinkAction,
+  approveContributionAction,
+  cancelMemorialDelete,
+  declineContributionAction,
+  ensureMemoryLinkAction,
   inviteCollaboratorAction,
   requestExport,
+  resendCollaboratorInviteAction,
+  revokeCollaboratorInviteAction,
   saveAbout,
   saveFavourites,
   saveMemories,
@@ -13,9 +18,13 @@ import {
   saveVoice,
   scheduleMemorialDelete,
   selfPublish,
+  sendMemoryRequestEmailAction,
   submitMemorial,
 } from "@/lib/family/actions";
+import { familyNoticeFromQuery } from "@/lib/family/notices";
+import { EDITOR_TIPS } from "@/lib/family/tips";
 import { requireMemorialAccess } from "@/lib/auth/session";
+import { contributionUrl } from "@/lib/email/invite";
 import { store } from "@/lib/platform/store";
 import { familyStatusLabel } from "@/lib/platform/lifecycle";
 import { SECTION_KEYS, SECTION_LABELS } from "@/lib/platform/enums";
@@ -25,37 +34,86 @@ import { MediaUploader } from "@/components/family/MediaUploader";
 import { VoiceRecorder } from "@/components/family/VoiceRecorder";
 import { FavouritesEditor, MemoriesEditor, PlacesEditor, TimelineEditor } from "@/components/family/RepeatableEditors";
 import { ConfirmSubmit } from "@/components/admin/ConfirmSubmit";
+import { CopyLinkButton } from "@/components/ui/CopyLinkButton";
+import { HeadingWithTip } from "@/components/ui/HeadingWithTip";
+import { PendingSubmit } from "@/components/ui/PendingSubmit";
+import Link from "next/link";
 
 type PageProps = {
   params: Promise<{ memorialId: string; section?: string[] }>;
+  searchParams: Promise<{ done?: string }>;
 };
 
-export default async function MemorialSectionPage({ params }: PageProps) {
+function formatWhen(iso: string) {
+  return new Date(iso).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
+}
+
+function formatDay(iso: string) {
+  return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function memberRoleLabel(role: string) {
+  if (role === "owner") return "Owner";
+  if (role === "viewer") return "Can preview";
+  return "Can edit";
+}
+
+export default async function MemorialSectionPage({ params, searchParams }: PageProps) {
   const { memorialId, section } = await params;
+  const { done } = await searchParams;
   const { role, session } = await requireMemorialAccess(memorialId, "view");
   const memorial = store.getMemorial(memorialId);
   const content = store.content.get(memorialId);
   if (!memorial || !content) notFound();
   const slug = section?.[0] ?? "overview";
   const canEdit = role === "owner" || role === "editor" || session.user.isAdmin;
+  const notice = familyNoticeFromQuery(done);
 
   if (slug === "sections" || slug === "family" || slug === "publish") {
     redirect(`/memorials/${memorialId}/overview`);
   }
 
+  const noticeBanner = notice ? (
+    <p className="rounded-lg border border-charcoal/20 bg-ivory px-4 py-3" role="status">
+      {notice}
+    </p>
+  ) : null;
+
   if (slug === "overview") {
-    const links = store.contributionLinks.filter((link) => link.memorialId === memorialId);
+    const memoryLink = store.getActiveMemoryLink(memorialId);
+    const memoryHref = memoryLink?.rawToken ? contributionUrl(memoryLink.rawToken) : null;
+    const pendingMemories = store.contributions.filter(
+      (row) => row.memorialId === memorialId && row.status === "pending" && row.kind === "memory",
+    );
+    const members = store.members.filter((member) => member.memorialId === memorialId);
+    const familyInvites = store.invitations.filter((row) => row.memorialId === memorialId && row.kind === "collaborator");
     const publishAction =
       memorial.publishingMode === "self_publish"
         ? selfPublish.bind(null, memorialId)
         : submitMemorial.bind(null, memorialId);
-    const publishLabel =
-      memorial.publishingMode === "self_publish" ? "Update the live memorial" : "Send to LifeMarked for review";
+    const isSelfPublish = memorial.publishingMode === "self_publish";
+    const publishLabel = isSelfPublish ? "Update the live memorial" : "Send to LifeMarked for review";
+    const publishConfirm = isSelfPublish
+      ? "This copies the current draft onto the public page. Visitors and QR scans will see it. Continue?"
+      : "This sends the draft to LifeMarked. Visitors will not see it until we make a version live. Continue?";
+    const canManage = role === "owner" || session.user.isAdmin;
     return (
       <section className="space-y-10">
+        {noticeBanner}
         <div>
-          <h1 className="font-serif text-3xl">Overview</h1>
+          <HeadingWithTip as="h1" className="font-serif text-3xl" tip={EDITOR_TIPS.overview}>
+            Overview
+          </HeadingWithTip>
           <p className="mt-3 text-warm-grey">{familyStatusLabel(memorial.status)}.</p>
+          {pendingMemories.length > 0 ? (
+            <p className="mt-3 text-sm">
+              <Link href={`/memorials/${memorialId}/memories`} className="text-link">
+                {pendingMemories.length === 1
+                  ? "1 memory is waiting for you to accept."
+                  : `${pendingMemories.length} memories are waiting for you to accept.`}
+              </Link>
+            </p>
+          ) : null}
           <dl className="mt-6 grid gap-4 sm:grid-cols-2">
             <div className="rounded-lg border border-border-warm bg-ivory p-4">
               <dt className="text-sm text-warm-grey">Name</dt>
@@ -69,25 +127,30 @@ export default async function MemorialSectionPage({ params }: PageProps) {
         </div>
 
         <div id="publish" className="rounded-lg border border-charcoal/20 bg-ivory p-6">
-          <h2 className="font-serif text-2xl">Make it live</h2>
+          <HeadingWithTip
+            className="font-serif text-2xl"
+            tip={isSelfPublish ? EDITOR_TIPS.publishSelf : EDITOR_TIPS.publishReview}
+          >
+            Make it live
+          </HeadingWithTip>
           <p className="mt-2 text-warm-grey">
-            {memorial.publishingMode === "self_publish"
-              ? "When you are ready, this copies the current draft onto the public page. Preview first if you want to check it."
+            {isSelfPublish
+              ? "When you are ready, this copies the current draft onto the public page."
               : "When you are ready, send the draft to LifeMarked. The public page will not change until we make a version live."}
           </p>
           {canEdit ? (
             <form action={publishAction} className="mt-6">
-              <ConfirmSubmit message="This will update the memorial for visitors if it is already live, or send it for review. Continue?">
-                {publishLabel}
-              </ConfirmSubmit>
+              <ConfirmSubmit message={publishConfirm}>{publishLabel}</ConfirmSubmit>
             </form>
           ) : null}
         </div>
 
         <div id="sections" className="rounded-lg border border-border-warm bg-ivory p-6">
-          <h2 className="font-serif text-2xl">What appears on the page</h2>
+          <HeadingWithTip className="font-serif text-2xl" tip={EDITOR_TIPS.sections}>
+            What appears on the page
+          </HeadingWithTip>
           <p className="mt-2 text-sm text-warm-grey">
-            Turn chapters on or off. Empty chapters never make a memorial look unfinished — they simply stay hidden.
+            Turn chapters on or off. Empty chapters stay hidden, so the page never looks unfinished.
           </p>
           <AutosaveForm action={saveSections.bind(null, memorialId)} disabled={!canEdit}>
             <ul className="mt-6 space-y-3">
@@ -110,7 +173,9 @@ export default async function MemorialSectionPage({ params }: PageProps) {
 
         <div id="family" className="rounded-lg border border-border-warm bg-ivory p-6 space-y-8">
           <div>
-            <h2 className="font-serif text-2xl">Family and privacy</h2>
+            <HeadingWithTip className="font-serif text-2xl" tip={EDITOR_TIPS.visibility}>
+              Family and privacy
+            </HeadingWithTip>
             <AutosaveForm action={saveAbout.bind(null, memorialId)} disabled={!canEdit}>
               <input type="hidden" name="firstName" value={memorial.firstName} />
               <input type="hidden" name="fullName" value={memorial.fullName} />
@@ -128,49 +193,162 @@ export default async function MemorialSectionPage({ params }: PageProps) {
               </label>
             </AutosaveForm>
           </div>
-          {role === "owner" || session.user.isAdmin ? (
+          {canManage ? (
             <>
-              <form action={inviteCollaboratorAction.bind(null, memorialId)} className="space-y-3">
-                <h3 className="font-serif text-xl">Invite family</h3>
-                <p className="text-sm text-warm-grey">We’ll email them a private link to help write or preview this memorial.</p>
-                <input name="email" type="email" required className="input-field" placeholder="Email" />
-                <select name="role" className="input-field">
-                  <option value="editor">Can edit</option>
-                  <option value="viewer">Can preview</option>
-                </select>
-                <button className="btn-primary" type="submit">
-                  Send invitation
-                </button>
-              </form>
-              <form action={createContributionLinkAction.bind(null, memorialId)} className="space-y-3">
-                <h3 className="font-serif text-xl">Ask for a memory</h3>
-                <input name="kinds" defaultValue="memory,photo" className="input-field" />
-                <button className="btn-primary" type="submit">
-                  Create contribution link
-                </button>
-              </form>
-              <ul className="text-sm text-warm-grey">
-                {links.map((link) => (
-                  <li key={link.id}>
-                    /c/{link.rawToken} — {link.submissionCount}/{link.maxSubmissions}
-                  </li>
-                ))}
-              </ul>
+              <div className="space-y-4">
+                <HeadingWithTip as="h3" className="font-serif text-xl" tip={EDITOR_TIPS.inviteFamily}>
+                  Invite family
+                </HeadingWithTip>
+                <p className="text-sm text-warm-grey">
+                  Can edit means they can change the draft. Can preview means they can look, but not change anything. We
+                  email them a private link.
+                </p>
+                <form action={inviteCollaboratorAction.bind(null, memorialId)} className="space-y-3">
+                  <input name="email" type="email" required className="input-field" placeholder="Email" />
+                  <select name="role" className="input-field">
+                    <option value="editor">Can edit</option>
+                    <option value="viewer">Can preview</option>
+                  </select>
+                  <PendingSubmit>Send invitation</PendingSubmit>
+                </form>
+                {members.length ? (
+                  <ul className="space-y-2 text-sm">
+                    {members.map((member) => {
+                      const profile = store.profiles.get(member.userId);
+                      return (
+                        <li key={`${member.userId}-${member.role}`}>
+                          {profile?.email ?? member.userId}{" "}
+                          <span className="text-warm-grey">({memberRoleLabel(member.role)})</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : null}
+                {familyInvites.length ? (
+                  <ul className="space-y-4">
+                    {familyInvites.map((invite) => {
+                      const expired =
+                        !invite.acceptedAt && !invite.revokedAt && new Date(invite.expiresAt).getTime() < Date.now();
+                      const state = invite.acceptedAt
+                        ? `Joined ${formatWhen(invite.acceptedAt)}`
+                        : invite.revokedAt
+                          ? "Deleted"
+                          : expired
+                            ? `Expired ${formatWhen(invite.expiresAt)}`
+                            : `Waiting. Expires ${formatWhen(invite.expiresAt)}`;
+                      const canResend = !invite.acceptedAt;
+                      const canDelete = !invite.acceptedAt && !invite.revokedAt;
+                      return (
+                        <li key={invite.id} className="rounded-md border border-border-warm p-4">
+                          <p>
+                            {invite.email}{" "}
+                            <span className="text-warm-grey">
+                              ({invite.collaboratorRole === "viewer" ? "Can preview" : "Can edit"})
+                            </span>
+                          </p>
+                          <p className="mt-1 text-sm text-warm-grey">{state}</p>
+                          <div className="mt-4 flex flex-wrap gap-3">
+                            {canResend ? (
+                              <form action={resendCollaboratorInviteAction.bind(null, memorialId)}>
+                                <input type="hidden" name="inviteId" value={invite.id} />
+                                <PendingSubmit className="btn-secondary" pendingLabel="Sending...">
+                                  {expired || invite.revokedAt ? "Send a new invite" : "Resend email"}
+                                </PendingSubmit>
+                              </form>
+                            ) : null}
+                            {canDelete ? (
+                              <form action={revokeCollaboratorInviteAction.bind(null, memorialId)}>
+                                <input type="hidden" name="inviteId" value={invite.id} />
+                                <ConfirmSubmit
+                                  className="btn-secondary"
+                                  message="This invite link will stop working. Continue?"
+                                >
+                                  Delete invite
+                                </ConfirmSubmit>
+                              </form>
+                            ) : null}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : null}
+              </div>
+
+              <div className="space-y-4">
+                <HeadingWithTip as="h3" className="font-serif text-xl" tip={EDITOR_TIPS.askMemory}>
+                  Ask for a memory
+                </HeadingWithTip>
+                <p className="text-sm text-warm-grey">
+                  Share a link, or email it. People can send a memory. It will not appear until you accept it on Memories.
+                </p>
+                {memoryHref && memoryLink ? (
+                  <>
+                    <label className="block text-sm text-warm-grey">
+                      Shareable link
+                      <input readOnly className="input-field mt-2 font-mono text-sm" value={memoryHref} />
+                    </label>
+                    <p className="text-sm text-warm-grey">
+                      {memoryLink.submissionCount}/{memoryLink.maxSubmissions} used. Expires {formatDay(memoryLink.expiresAt)}.
+                    </p>
+                    <CopyLinkButton value={memoryHref} />
+                    <form action={sendMemoryRequestEmailAction.bind(null, memorialId)} className="space-y-3">
+                      <label className="block text-sm">
+                        Email this link
+                        <input name="email" type="email" required className="input-field mt-2" placeholder="friend@example.com" />
+                      </label>
+                      <PendingSubmit>Send</PendingSubmit>
+                    </form>
+                  </>
+                ) : (
+                  <form action={ensureMemoryLinkAction.bind(null, memorialId)}>
+                    <PendingSubmit pendingLabel="Working...">Create a shareable link</PendingSubmit>
+                  </form>
+                )}
+              </div>
+
               <form
                 action={async () => {
                   "use server";
                   await requestExport(memorialId);
                 }}
               >
-                <button className="btn-secondary" type="submit">
+                <PendingSubmit className="btn-secondary" pendingLabel="Working...">
                   Request a copy of the originals
-                </button>
+                </PendingSubmit>
               </form>
-              <form action={scheduleMemorialDelete.bind(null, memorialId)}>
-                <button className="text-link" type="submit">
-                  Close this memorial (30-day grace)
-                </button>
-              </form>
+
+              <div className="space-y-3">
+                <HeadingWithTip as="h3" className="font-serif text-xl" tip={EDITOR_TIPS.closeMemorial}>
+                  Close this memorial
+                </HeadingWithTip>
+                {memorial.deletedAt ? (
+                  <>
+                    <p className="text-sm text-warm-grey">
+                      Visitors cannot see this memorial. We keep the files until{" "}
+                      {memorial.purgeAfter ? formatDay(memorial.purgeAfter) : "the end of the 30 days"}. You can cancel
+                      until then.
+                    </p>
+                    <form action={cancelMemorialDelete.bind(null, memorialId)}>
+                      <ConfirmSubmit
+                        className="btn-secondary"
+                        message="This will cancel the close. Family can keep working on the memorial. Continue?"
+                      >
+                        Cancel close
+                      </ConfirmSubmit>
+                    </form>
+                  </>
+                ) : (
+                  <form action={scheduleMemorialDelete.bind(null, memorialId)}>
+                    <ConfirmSubmit
+                      className="btn-secondary"
+                      message="Visitors will lose access immediately. We keep the files for 30 days, and you can cancel in that time. Continue?"
+                    >
+                      Close this memorial
+                    </ConfirmSubmit>
+                  </form>
+                )}
+              </div>
             </>
           ) : null}
         </div>
@@ -181,7 +359,9 @@ export default async function MemorialSectionPage({ params }: PageProps) {
   if (slug === "about") {
     return (
       <AutosaveForm action={saveAbout.bind(null, memorialId)} disabled={!canEdit}>
-        <h1 className="font-serif text-3xl">About them</h1>
+        <HeadingWithTip as="h1" className="font-serif text-3xl" tip={EDITOR_TIPS.about}>
+          About them
+        </HeadingWithTip>
         <label className="mt-8 block text-sm">First name
           <input name="firstName" defaultValue={memorial.firstName} className="input-field mt-2" />
         </label>
@@ -218,7 +398,9 @@ export default async function MemorialSectionPage({ params }: PageProps) {
   if (slug === "story") {
     return (
       <section>
-        <h1 className="font-serif text-3xl">Their story</h1>
+        <HeadingWithTip as="h1" className="font-serif text-3xl" tip={EDITOR_TIPS.story}>
+          Their story
+        </HeadingWithTip>
         <StoryEditor
           memorialId={memorialId}
           initial={content.story}
@@ -232,7 +414,9 @@ export default async function MemorialSectionPage({ params }: PageProps) {
   if (slug === "timeline") {
     return (
       <AutosaveForm action={saveTimeline.bind(null, memorialId)} disabled={!canEdit}>
-        <h1 className="font-serif text-3xl">Life moments</h1>
+        <HeadingWithTip as="h1" className="font-serif text-3xl" tip={EDITOR_TIPS.timeline}>
+          Life moments
+        </HeadingWithTip>
         <p className="mt-2 text-sm text-warm-grey">Add the years and moments that shaped their life. You can reorder them at any time.</p>
         <TimelineEditor name="timeline" initial={content.timeline} />
       </AutosaveForm>
@@ -242,7 +426,9 @@ export default async function MemorialSectionPage({ params }: PageProps) {
   if (slug === "gallery") {
     return (
       <section>
-        <h1 className="font-serif text-3xl">Photographs</h1>
+        <HeadingWithTip as="h1" className="font-serif text-3xl" tip={EDITOR_TIPS.gallery}>
+          Photographs
+        </HeadingWithTip>
         <p className="mt-3 text-warm-grey">
           iPhone photos (including HEIC) are welcome. Each file is scanned and stored before it can
           appear on the memorial.
@@ -265,7 +451,9 @@ export default async function MemorialSectionPage({ params }: PageProps) {
   if (slug === "favourites") {
     return (
       <AutosaveForm action={saveFavourites.bind(null, memorialId)} disabled={!canEdit}>
-        <h1 className="font-serif text-3xl">Favourites</h1>
+        <HeadingWithTip as="h1" className="font-serif text-3xl" tip={EDITOR_TIPS.favourites}>
+          Favourites
+        </HeadingWithTip>
         <p className="mt-2 text-sm text-warm-grey">The small things that made them themselves. Add one at a time.</p>
         <FavouritesEditor name="favourites" initial={content.favouriteThings} />
       </AutosaveForm>
@@ -273,22 +461,62 @@ export default async function MemorialSectionPage({ params }: PageProps) {
   }
 
   if (slug === "memories") {
+    const pendingMemories = store.contributions.filter(
+      (row) => row.memorialId === memorialId && row.status === "pending" && row.kind === "memory",
+    );
     return (
-      <AutosaveForm action={saveMemories.bind(null, memorialId)} disabled={!canEdit}>
-        <h1 className="font-serif text-3xl">Memories</h1>
-        <p className="mt-2 text-sm text-warm-grey">Collect what people remember. Add the words, then who said them.</p>
-        <MemoriesEditor
-          name="memories"
-          initial={content.memories.map((memory) => ({ quote: memory.quote, author: memory.author }))}
-        />
-      </AutosaveForm>
+      <section className="space-y-10">
+        {noticeBanner}
+        <div>
+          <HeadingWithTip as="h1" className="font-serif text-3xl" tip={EDITOR_TIPS.memories}>
+            Memories
+          </HeadingWithTip>
+          <p className="mt-2 text-sm text-warm-grey">Collect what people remember. Add the words, then who said them.</p>
+        </div>
+        {pendingMemories.length > 0 && canEdit ? (
+          <div className="space-y-4">
+            <h2 className="font-serif text-xl">Waiting for you</h2>
+            <ul className="space-y-4">
+              {pendingMemories.map((row) => (
+                <li key={row.id} className="rounded-lg border border-border-warm p-4">
+                  <p>{String(row.payload.quote ?? "")}</p>
+                  <p className="mt-2 text-sm text-warm-grey">{row.submitterName}</p>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <form action={approveContributionAction.bind(null, memorialId)}>
+                      <input type="hidden" name="contributionId" value={row.id} />
+                      <PendingSubmit pendingLabel="Working...">Accept</PendingSubmit>
+                    </form>
+                    <form action={declineContributionAction.bind(null, memorialId)}>
+                      <input type="hidden" name="contributionId" value={row.id} />
+                      <ConfirmSubmit
+                        className="btn-secondary"
+                        message="This memory will not be added. Continue?"
+                      >
+                        Decline
+                      </ConfirmSubmit>
+                    </form>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        <AutosaveForm action={saveMemories.bind(null, memorialId)} disabled={!canEdit}>
+          <MemoriesEditor
+            name="memories"
+            initial={content.memories.map((memory) => ({ quote: memory.quote, author: memory.author }))}
+          />
+        </AutosaveForm>
+      </section>
     );
   }
 
   if (slug === "voice") {
     return (
       <section>
-        <h1 className="font-serif text-3xl">Voice</h1>
+        <HeadingWithTip as="h1" className="font-serif text-3xl" tip={EDITOR_TIPS.voice}>
+          Voice
+        </HeadingWithTip>
         <p className="mt-3 text-warm-grey">Record on this phone or upload a file. Playback is prepared after a security scan.</p>
         {canEdit ? (
           <>
@@ -311,7 +539,9 @@ export default async function MemorialSectionPage({ params }: PageProps) {
   if (slug === "video") {
     return (
       <section>
-        <h1 className="font-serif text-3xl">Video</h1>
+        <HeadingWithTip as="h1" className="font-serif text-3xl" tip={EDITOR_TIPS.video}>
+          Video
+        </HeadingWithTip>
         <p className="mt-3 text-warm-grey">
           The original file is stored with LifeMarked and played from there.
         </p>
@@ -332,7 +562,9 @@ export default async function MemorialSectionPage({ params }: PageProps) {
   if (slug === "places") {
     return (
       <AutosaveForm action={savePlaces.bind(null, memorialId)} disabled={!canEdit}>
-        <h1 className="font-serif text-3xl">Places</h1>
+        <HeadingWithTip as="h1" className="font-serif text-3xl" tip={EDITOR_TIPS.places}>
+          Places
+        </HeadingWithTip>
         <p className="mt-2 text-sm text-warm-grey">Add the places that mattered. You can include more than one, and reorder them.</p>
         <PlacesEditor
           name="places"

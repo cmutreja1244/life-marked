@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ConfirmSubmit } from "@/components/admin/ConfirmSubmit";
+import { PendingSubmit } from "@/components/ui/PendingSubmit";
 import { adminPublish, adminRequestChanges } from "@/lib/admin/actions";
 import { store } from "@/lib/platform/store";
 
@@ -32,9 +33,9 @@ export default function ReviewQueuePage() {
               </form>
               <form action={adminRequestChanges.bind(null, memorial.id)}>
                 <input type="hidden" name="note" value="Sent back from the review list." />
-                <button className="btn-secondary" type="submit">
+                <PendingSubmit className="btn-secondary" pendingLabel="Working...">
                   Send back
-                </button>
+                </PendingSubmit>
               </form>
             </div>
           </li>

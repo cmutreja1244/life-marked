@@ -23,7 +23,14 @@ function inviteNotice(status: "sent" | "skipped" | "failed"): AdminMemorialNotic
   return "invite_failed";
 }
 
-async function deliverInvitation(memorialId: string, invitation: { id: string; email: string; kind: "owner" | "collaborator"; rawToken?: string; expiresAt: string }) {
+async function deliverInvitation(memorialId: string, invitation: {
+  id: string;
+  email: string;
+  kind: "owner" | "collaborator";
+  collaboratorRole?: "owner" | "editor" | "viewer" | null;
+  rawToken?: string;
+  expiresAt: string;
+}) {
   const memorial = store.getMemorial(memorialId);
   if (!invitation.rawToken || !memorial) return "failed" as const;
   const result = await sendFamilyInviteEmail({
@@ -33,6 +40,7 @@ async function deliverInvitation(memorialId: string, invitation: { id: string; e
     rawToken: invitation.rawToken,
     expiresAt: invitation.expiresAt,
     kind: invitation.kind,
+    collaboratorRole: invitation.collaboratorRole,
   });
   if (result.status !== "failed") store.markInviteSent(invitation.id);
   return result.status;

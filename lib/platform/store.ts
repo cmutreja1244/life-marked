@@ -688,6 +688,32 @@ class PlatformRepository {
     asset.publicUrl = null;
   }
 
+  getActiveMemoryLink(memorialId: string) {
+    const now = Date.now();
+    return (
+      this.contributionLinks.find(
+        (link) =>
+          link.memorialId === memorialId &&
+          !link.revokedAt &&
+          Boolean(link.rawToken) &&
+          new Date(link.expiresAt).getTime() > now,
+      ) ?? null
+    );
+  }
+
+  async getOrCreateMemoryLink(memorialId: string, actorId: string | null) {
+    const existing = this.getActiveMemoryLink(memorialId);
+    if (existing) return existing;
+    const link = await this.createContributionLink(memorialId, {
+      allowedKinds: ["memory"],
+      maxSubmissions: 20,
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      reusable: true,
+    });
+    this.recordAudit(actorId, memorialId, "contribution_link.created", {});
+    return link;
+  }
+
   async createContributionLink(
     memorialId: string,
     input: Partial<ContributionLinkRecord> & Pick<ContributionLinkRecord, "allowedKinds" | "maxSubmissions" | "expiresAt">,
@@ -735,6 +761,7 @@ class PlatformRepository {
   approveContribution(id: string) {
     const row = this.contributions.find((item) => item.id === id);
     if (!row) throw new Error("Contribution not found.");
+    if (row.status === "approved") return row;
     row.status = "approved";
     const content = this.content.get(row.memorialId);
     if (content && row.kind === "memory") {
@@ -744,6 +771,15 @@ class PlatformRepository {
         status: "approved",
       });
     }
+    return row;
+  }
+
+  rejectContribution(id: string) {
+    const row = this.contributions.find((item) => item.id === id);
+    if (!row) throw new Error("Contribution not found.");
+    if (row.status === "approved") throw new Error("This memory has already been accepted.");
+    row.status = "rejected";
+    return row;
   }
 
   createReport(body: string, publicToken: string | null, email: string | null) {
@@ -838,6 +874,7 @@ class PlatformRepository {
 
 const globalStore = globalThis as typeof globalThis & { __lifemarkedStore?: PlatformRepository };
 export const store = globalStore.__lifemarkedStore ?? new PlatformRepository();
+Object.setPrototypeOf(store, PlatformRepository.prototype);
 globalStore.__lifemarkedStore = store;
 
 export { PlatformRepository };

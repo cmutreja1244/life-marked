@@ -16,6 +16,11 @@ export default async function FamilyLayout({ children }: { children: React.React
           </Link>
           <div className="flex items-center gap-4 text-sm">
             <span className="hidden text-warm-grey sm:inline">{session.user.email}</span>
+            {session.user.isAdmin ? (
+              <Link href="/admin" className="text-link">
+                Admin
+              </Link>
+            ) : null}
             <Link href="/settings" className="text-link">
               Account
             </Link>
