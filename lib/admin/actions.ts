@@ -7,6 +7,7 @@ import { isMemorialLive } from "@/lib/platform/lifecycle";
 import { memorialDeskPath, type AdminMemorialNotice } from "@/lib/admin/notices";
 import { requireAdmin } from "@/lib/auth/session";
 import { store } from "@/lib/platform/store";
+import { persistMemorial } from "@/lib/platform/persist";
 
 function revalidateMemorial(memorialId: string) {
   const slug = store.routes.find((route) => route.memorialId === memorialId && route.isCanonical)?.slug ?? "";
@@ -55,6 +56,7 @@ export async function adminCreateMemorial(formData: FormData) {
     actorId: session.user.id,
     publishingMode: formData.get("publishingMode") === "self_publish" ? "self_publish" : "admin_review",
   });
+  await persistMemorial(created);
   const email = String(formData.get("ownerEmail") ?? "").trim();
   let notice: AdminMemorialNotice | undefined;
   if (email) {
@@ -75,7 +77,7 @@ export async function adminInviteOwner(memorialId: string, formData: FormData) {
 
 export async function adminRevokeInvite(memorialId: string, formData: FormData) {
   await requireAdmin();
-  store.revokeInvitation(String(formData.get("inviteId") ?? ""));
+  await store.revokeInvitation(String(formData.get("inviteId") ?? ""));
   revalidateMemorial(memorialId);
   redirect(memorialDeskPath(memorialId, "invite_deleted"));
 }

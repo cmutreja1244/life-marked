@@ -128,7 +128,7 @@ export function signInCodeEmailHtml(input: { recipientEmail: string; code: strin
     recipientEmail: input.recipientEmail,
     headline: "Your sign-in code",
     paragraphs: [
-      "Enter this 6-digit code on the LifeMarked sign-in page. We will never ask you for it by phone or in another email.",
+      "Enter this 8-digit code on the LifeMarked sign-in page. We will never ask you for it by phone or in another email.",
     ],
     code: input.code,
     expiryNote: "This code expires in one hour.",

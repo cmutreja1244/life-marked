@@ -18,6 +18,7 @@ import type {
 } from "./types";
 import { defaultSections } from "./types";
 import { denormalisedOwnerId } from "./ownership";
+import { loadInvitationByHash, persistInvitation, persistMember, persistMemorial, persistProfile } from "./persist";
 import { publicMemorialOutcome, type PublicOutcome } from "./visibility";
 
 export type Member = { memorialId: string; userId: string; role: MemberRole };
@@ -329,6 +330,8 @@ class PlatformRepository {
     memorial.status = "owner_invited";
     memorial.updatedAt = nowIso();
     this.recordAudit(actorId, memorialId, "invite.owner", { email });
+    await persistMemorial(memorial);
+    await persistInvitation(invitation, actorId);
     return { ...invitation };
   }
 
@@ -354,12 +357,22 @@ class PlatformRepository {
     };
     this.invitations.push(invitation);
     this.recordAudit(actorId, memorialId, "invite.collaborator", { email, role });
+    const memorial = this.memorials.get(memorialId);
+    if (memorial) await persistMemorial(memorial);
+    await persistInvitation(invitation, actorId);
     return invitation;
   }
 
   async acceptInvite(rawToken: string, user: Profile) {
     const hash = await sha256(rawToken);
-    const invitation = this.invitations.find((row) => row.tokenHash === hash);
+    let invitation = this.invitations.find((row) => row.tokenHash === hash);
+    if (!invitation) {
+      const loaded = await loadInvitationByHash(hash);
+      if (loaded) {
+        this.invitations.push(loaded);
+        invitation = loaded;
+      }
+    }
     if (!invitation || invitation.revokedAt || invitation.acceptedAt) {
       throw new Error("This invitation is no longer valid.");
     }
@@ -371,7 +384,8 @@ class PlatformRepository {
     if (role === "owner" && this.members.some((member) => member.memorialId === invitation.memorialId && member.role === "owner")) {
       throw new Error("This memorial already has an owner.");
     }
-    this.members.push({ memorialId: invitation.memorialId, userId: user.id, role });
+    const member = { memorialId: invitation.memorialId, userId: user.id, role };
+    this.members.push(member);
     this.syncOwner(invitation.memorialId);
     invitation.acceptedAt = nowIso();
     const memorial = this.memorials.get(invitation.memorialId);
@@ -379,6 +393,10 @@ class PlatformRepository {
       memorial.status = "in_progress";
       memorial.updatedAt = nowIso();
     }
+    await persistProfile(user);
+    if (memorial) await persistMemorial(memorial);
+    await persistMember(member);
+    await persistInvitation(invitation);
     return invitation.memorialId;
   }
 
@@ -389,13 +407,14 @@ class PlatformRepository {
     return invitation;
   }
 
-  revokeInvitation(invitationId: string) {
+  async revokeInvitation(invitationId: string) {
     const invitation = this.invitations.find((row) => row.id === invitationId);
     if (!invitation) throw new Error("Invite not found.");
     if (invitation.acceptedAt) throw new Error("This invite has already been used.");
     invitation.revokedAt = nowIso();
     invitation.rawToken = undefined;
     this.recordAudit(null, invitation.memorialId, "invite.revoked", { invitationId });
+    await persistInvitation(invitation);
     return invitation;
   }
 
@@ -409,6 +428,7 @@ class PlatformRepository {
     invitation.revokedAt = null;
     invitation.expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
     this.recordAudit(actorId, invitation.memorialId, "invite.renewed", { invitationId });
+    await persistInvitation(invitation, actorId);
     return { ...invitation, rawToken };
   }
 

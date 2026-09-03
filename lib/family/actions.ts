@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireFamily, requireMemorialAccess } from "@/lib/auth/session";
+import { requireFamily, requireMemorialAccess, rememberAccessGrant } from "@/lib/auth/session";
 import { sendFamilyInviteEmail, sendMemoryRequestEmail } from "@/lib/email/invite";
 import {
   editorMemoriesPath,
@@ -174,6 +174,8 @@ export async function acceptInviteAction(formData: FormData) {
   const session = await requireFamily();
   const token = String(formData.get("token") ?? "");
   const memorialId = await store.acceptInvite(token, session.user);
+  const membership = store.membership(memorialId, session.user.id);
+  if (membership) await rememberAccessGrant(membership);
   revalidatePath("/home");
   return memorialId;
 }
@@ -242,7 +244,7 @@ export async function resendCollaboratorInviteAction(memorialId: string, formDat
 
 export async function revokeCollaboratorInviteAction(memorialId: string, formData: FormData) {
   await requireMemorialAccess(memorialId, "manage");
-  store.revokeInvitation(String(formData.get("inviteId") ?? ""));
+  await store.revokeInvitation(String(formData.get("inviteId") ?? ""));
   await touch(memorialId);
   redirect(editorOverviewPath(memorialId, "invite_deleted"));
 }

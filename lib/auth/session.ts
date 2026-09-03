@@ -3,9 +3,11 @@ import { createServerClient } from "@supabase/ssr";
 import { env, hasSupabase } from "@/lib/env";
 import { store, type PlatformRepository } from "@/lib/platform/store";
 import type { Profile } from "@/lib/platform/types";
-import { canEditMemorial, canManageAccess } from "@/lib/platform/ownership";
+import { canEditMemorial, canManageAccess, type Membership } from "@/lib/platform/ownership";
+import { listMembersForUser, persistMember, persistMemorial, persistProfile } from "@/lib/platform/persist";
 
 export const SESSION_COOKIE = "lm-session";
+const ACCESS_COOKIE = "lm-access";
 
 export type Session = {
   user: Profile;
@@ -60,10 +62,64 @@ export async function getSession(): Promise<Session | null> {
       deletedAt: null,
     };
     store.upsertProfile(profile);
+    if (!profileRow) {
+      try {
+        await persistProfile(profile);
+      } catch (error) {
+        console.error("[persist profile]", error);
+      }
+    }
+    try {
+      await hydrateMembers(profile.id);
+    } catch (error) {
+      console.error("[hydrate members]", error);
+    }
     return { user: profile, aal };
   }
 
   return readSessionCookie();
+}
+
+function rememberMember(member: Membership) {
+  if (!store.membership(member.memorialId, member.userId)) {
+    store.members.push(member);
+  }
+}
+
+async function readAccessGrants(): Promise<Membership[]> {
+  const jar = await cookies();
+  const raw = jar.get(ACCESS_COOKIE)?.value;
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(Buffer.from(raw, "base64url").toString("utf8")) as Membership[];
+    return Array.isArray(parsed) ? parsed.filter((row) => row?.memorialId && row?.userId && row?.role) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function rememberAccessGrant(member: Membership) {
+  const jar = await cookies();
+  const grants = await readAccessGrants();
+  if (!grants.some((row) => row.memorialId === member.memorialId && row.userId === member.userId)) {
+    grants.push(member);
+  }
+  jar.set(ACCESS_COOKIE, Buffer.from(JSON.stringify(grants)).toString("base64url"), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+  });
+}
+
+async function hydrateMembers(userId: string) {
+  for (const grant of await readAccessGrants()) {
+    if (grant.userId === userId) rememberMember(grant);
+  }
+  for (const member of await listMembersForUser(userId)) {
+    rememberMember(member);
+  }
 }
 
 export async function setSession(session: Session) {
@@ -80,6 +136,7 @@ export async function setSession(session: Session) {
 export async function clearSession() {
   const jar = await cookies();
   jar.delete(SESSION_COOKIE);
+  jar.delete(ACCESS_COOKIE);
 }
 
 export async function requireFamily() {
@@ -98,7 +155,22 @@ export async function requireAdmin() {
 export async function requireMemorialAccess(memorialId: string, mode: "view" | "edit" | "manage" = "view") {
   const session = await getSession();
   if (!session) throw new Error("Please sign in.");
+  try {
+    await hydrateMembers(session.user.id);
+  } catch (error) {
+    console.error("[hydrate members]", error);
+  }
   const membership = store.membership(memorialId, session.user.id);
+  if (membership) {
+    try {
+      const memorial = store.getMemorial(memorialId);
+      if (memorial) await persistMemorial(memorial);
+      await persistProfile(session.user);
+      await persistMember(membership);
+    } catch (error) {
+      console.error("[persist member]", error);
+    }
+  }
   const role = membership?.role ?? null;
   if (mode === "view" && !(session.user.isAdmin || role)) throw new Error("You do not have access to this memorial.");
   if (mode === "edit" && !canEditMemorial(role, session.user.isAdmin)) {

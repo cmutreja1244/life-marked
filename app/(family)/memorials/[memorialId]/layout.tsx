@@ -36,7 +36,7 @@ export default async function MemorialEditorLayout({
     role = access.role;
     isAdmin = access.session.user.isAdmin;
   } catch {
-    redirect("/login");
+    redirect("/home");
   }
   const memorial = store.getMemorial(memorialId);
   if (!memorial) notFound();

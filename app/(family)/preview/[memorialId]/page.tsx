@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { PublicMemorial } from "@/components/memorial/PublicMemorial";
 import { requireMemorialAccess } from "@/lib/auth/session";
 import { store } from "@/lib/platform/store";
@@ -13,7 +13,11 @@ export const dynamic = "force-dynamic";
 
 export default async function PreviewPage({ params }: { params: Promise<{ memorialId: string }> }) {
   const { memorialId } = await params;
-  await requireMemorialAccess(memorialId, "view");
+  try {
+    await requireMemorialAccess(memorialId, "view");
+  } catch {
+    redirect("/home");
+  }
   const memorial = store.getMemorial(memorialId);
   if (!memorial) notFound();
   const snapshot = store.previewSnapshot(memorialId);
